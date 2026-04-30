@@ -5,8 +5,8 @@ This backend ctr management control shcolarship students.
 Clone the repository and install dependencies
 
 ```bash
-https://github.com/Sourcedevkh/AlumniNet-Backend.git
-cd AlumniNet-Backend
+https://github.com/Sourcedevkh/alumniNet-api.git
+cd alumniNet-api
 npm install
 ```
 
@@ -27,4 +27,11 @@ This script will:
 This link DFD AlumniNet handler by teams
 ```bash
 https://www.figma.com/board/rfimfi3raLKQMN0NTBRzXv/DFD?node-id=0-1&p=f&t=TMOd8c71EM0zIMaP-0
+```
+
+## Entity-Relationship Diagram (ERD)
+
+Link ERD AlumniNet 
+```bash
+https://app.diagrams.net/#G1ap1pF7XEU4Yz5HrFcLFizsA_vNkqydbO#%7B%22pageId%22%3A%22DXpJS6MCztRd8iwsVssI%22%7D
 ```
