@@ -16,8 +16,14 @@ const findByEmail = async (email) => {
     return rows;
 }
 
+const updateStatus = async (id, status) => {
+    let [result] = await pool.query('UPDATE users SET is_active = ? WHERE id = ?', [status, id]);
+    return result.affectedRows;
+} 
+
 module.exports = {
     create,
     findByEmail,
-    findById
+    findById,
+    updateStatus
 }
