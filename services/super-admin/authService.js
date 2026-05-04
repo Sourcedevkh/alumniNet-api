@@ -18,13 +18,25 @@ const create = async (body) => {
         name: body.name,
         email: body.email,
         password: hashedPWD,
-        // verificationToken: verificationToken,
-        // verificationExpires: verificationExpires,
+        verificationToken: verificationToken,
+        verificationExpires: verificationExpires,
     });
     let rows = await User.findById(result);
     return rows;
 }
 
+const adminStatus = async (id, status) => {
+    let admin = await User.findById(id);
+    if(admin.length === 0){
+        throw new Error('Admin account not found');
+    }
+
+    await User.updateStatus(id, status);
+    let updatedRow = await User.findById(id);
+    return updatedRow[0];
+}
+
 module.exports = {
     create,
+    adminStatus
 }
