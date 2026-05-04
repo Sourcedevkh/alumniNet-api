@@ -28,12 +28,12 @@ const createUserSchema = Jol.object({
 });
 
 const loginUserSchema = Jol.object({
-    email: Jol.string().email().required(),
-    password: Jol.string().required()    
+    email: Jol.string().email().required().messages({'any.required': 'Email is required'}),
+    password: Jol.string().required().messages({'any.required': 'Password is required'})    
 });
 
 const resetVerificationLinkSchema = Jol.object({
-    email: Jol.string().email().required()
+    email: Jol.string().email().required().messages({'any.required': 'Email is required'})
 });
 
 const resetPasswordSchema = Jol.object({
