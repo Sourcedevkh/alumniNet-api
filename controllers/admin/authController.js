@@ -3,10 +3,11 @@ const {sendResponse} = require('../../utils/responseHelper');
 
 const login = async (req, res) => {
     try {
-        const userInfo = await authService.login(req.body);
-        sendResponse(res, 200, userInfo);
+        let arrs = req.validateBody;
+        const result = await authService.login(arrs);
+        return sendResponse(res, 200, true, 'Login successed', result);
     } catch (error) {
-        sendResponse(res, 400, { error: error.message });
+        return sendResponse(res, 400, false, error.message);
     }
 }
 
@@ -21,10 +22,11 @@ const verifyEmail = async (req, res) => {
 
 const getMe = async (req, res) => {
     try {
-        let row = await authService.getMe(req.params.id);
-        console.log(row);
+        const userId = req.user.id; 
         
-        return sendResponse(res, 200, true, 'User information', row);
+        const userData = await authService.getMe(userId);
+        
+        return sendResponse(res, 200, true, 'User information', userData);
     } catch (error) {
         return sendResponse(res, 400, false, error.message);
     }
