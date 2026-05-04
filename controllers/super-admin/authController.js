@@ -3,8 +3,9 @@ const {sendResponse} = require('../../utils/responseHelper');
 
 const register = async(req, res) =>{
     try {
-        let arrs = await authService.create(req.body);
-        return sendResponse(res, 201, true, 'User created', arrs);
+        let arrs = req.validateBody;
+        let result = await authService.create(arrs);
+        return sendResponse(res, 201, true, 'User created', result);
     } catch (error) {
         return sendResponse(res, 400, false, error.message);
     }
