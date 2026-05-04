@@ -1,26 +1,31 @@
-const User = require('../../models/super-admin/user');
 const bycrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 const crypto = require('crypto');
+const User = require('../../models/super-admin/user');
+const emailService = require('../../utils/emailService');
 
 const create = async (body) => {
-    let check_email = await User.findByEmail(body.email);
+    let {name, email, password} = body;
+    let check_email = await User.findByEmail(email);
     if(check_email.length > 0){
         throw new Error('Email already exists');
     }
 
     // Hash pasword
-    const hashedPWD = await bycrypt.hash(body.password, 10);
+    const hashedPWD = await bycrypt.hash(password, 10);
     const verificationToken = crypto.randomBytes(37).toString('hex');
-    const verificationExpires = new Date(Date.now() + 5 * 60 * 1000); // 5 minutes
+    const verificationExpires = new Date(Date.now() + 15 * 60 * 1000); // 15 minutes
 
     let result = await User.create({
-        name: body.name,
-        email: body.email,
+        name: name,
+        email: email,
         password: hashedPWD,
         verificationToken: verificationToken,
         verificationExpires: verificationExpires,
     });
+
+    await emailService.sendVerificationEmail(email, verificationToken)
+
     let rows = await User.findById(result);
     return rows;
 }
