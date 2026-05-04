@@ -6,6 +6,7 @@ const findByEmail = async (email) => {
 }
 
 const findById = async (id) => {
+    // do not select the token field when returning user profile
     let [rows] = await pool.query('SELECT id, name, email, phone, address, role, is_active, is_verified FROM users WHERE id = ?', [id]);
     return rows;
 }
@@ -15,8 +16,18 @@ const findByVerificationEmail = async (token) => {
     return rows;
 }
 
+const getToken = async (token) => {
+    let [row] = await pool.query('SELECT token FROM users WHERE token = ?', [token]);
+    return row;
+}
+
 const verifyEmail = async (id) =>{
     await pool.query('UPDATE users SET is_verified = 1 WHERE id = ?', [id]);
+}
+
+const addToken = async (token, id) => {
+    const [result] = await pool.query('UPDATE users SET token = ? WHERE id = ?', [token, id]);
+    return result;
 }
 
 module.exports = {
@@ -24,4 +35,6 @@ module.exports = {
     findById,
     findByVerificationEmail,
     verifyEmail,
+    getToken,
+    addToken
 }
