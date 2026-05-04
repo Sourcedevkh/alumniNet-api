@@ -11,8 +11,12 @@ app.use(express.json());
 // Super-admin 
 const authRoute = require('./routes/super-admin/userRoute');
 
+// Admin
+const authAdminRoute = require('./routes/admin/userRoutes');
+
 
 app.use('/api/auth', authRoute);
+app.use('/api/admin/auth', authAdminRoute);
 
 app.listen(PORT, () => {
     console.log(`Service running on port ${PORT}`);
