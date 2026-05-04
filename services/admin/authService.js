@@ -1,12 +1,44 @@
+const jwtConfig = require('../../config/jwt');
 const User = require('../../models/admin/user'); 
+const jwt = require('jsonwebtoken');
+const bcrypt = require('bcrypt');
 
 const login = async (body) => {
     let userInfo = await User.findByEmail(body.email);
     if(userInfo.length === 0){
         throw new Error('Email and Password invalid');
     }
-    console.log(userInfo);
-    
+
+    const isMatch = await bcrypt.compare(body.password, userInfo[0].password);
+    if(!isMatch){
+        throw new Error('Email and Password invalid');
+    }
+
+    if(!userInfo[0].is_verified){
+        throw new Error('Please verify your email before logging in');
+    }
+
+    const token = jwt.sign(
+        // payload
+        {
+            id: userInfo[0].id,
+            email: userInfo[0].email
+        },
+
+        // secret key and options
+        jwtConfig.secret,
+        {expiresIn: jwtConfig.expiresIn}
+    );
+
+    // save token to database 
+    await User.addToken(token, userInfo[0].id);
+
+    const data = await User.findById(userInfo[0].id);
+    const userObejct = data[0];
+    return {
+        ...userObejct,
+        token: token
+    }
 }
 
 const getMe = async (id) => {
@@ -15,7 +47,7 @@ const getMe = async (id) => {
         throw new Error('User not found');
     }
     
-    return data;
+    return data[0];
 }
     
 const verifyEmail = async (token) => {
