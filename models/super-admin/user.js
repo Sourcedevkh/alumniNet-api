@@ -21,9 +21,15 @@ const updateStatus = async (id, status) => {
     return result.affectedRows;
 } 
 
+const updatePassword = async(id, hashedPassword) => {
+    let [result] = await pool.query('UPDATE users SET password = ? WHERE id = ?', [hashedPassword, id]);
+    return result.affectedRows;
+}
+
 module.exports = {
     create,
     findByEmail,
     findById,
-    updateStatus
+    updateStatus,
+    updatePassword
 }
