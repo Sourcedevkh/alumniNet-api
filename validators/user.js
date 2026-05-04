@@ -1,7 +1,7 @@
-const jol = require('joi');
+const Jol = require('joi');
 
-const createUserSchema = jol.object({
-    name: jol.string()
+const createUserSchema = Jol.object({
+    name: Jol.string()
         .min(3)
         .max(50)
         .required()
@@ -9,14 +9,14 @@ const createUserSchema = jol.object({
             'string.min': 'Name must be at least 3 characters long',
             'any.required': 'Name is required'
         }),
-    email: jol.string()
+    email: Jol.string()
         .email()
         .required()
         .messages({
             'string.email': 'Please enter a valid email address',
             'any.required': 'Email is required'
         }),
-    password: jol.string()
+    password: Jol.string()
         .min(6)
         .required()
         .pattern(new RegExp('^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9])(?=.*?[#?!@$%^&*-]).{6,}$'))
@@ -27,17 +27,28 @@ const createUserSchema = jol.object({
         })
 });
 
-const loginUserSchema = jol.object({
-    email: jol.string().email().required(),
-    password: jol.string().required()    
+const loginUserSchema = Jol.object({
+    email: Jol.string().email().required(),
+    password: Jol.string().required()    
 });
 
-const resetVerificationLinkSchema = jol.object({
-    email: jol.string().email().required()
+const resetVerificationLinkSchema = Jol.object({
+    email: Jol.string().email().required()
+});
+
+const resetPasswordSchema = Jol.object({
+    newPassword: Jol.string()
+        .min(6)
+        .required()
+        .messages({
+            'string.min': 'New password must be at least 6 characters long',
+            'any.required': 'New password is required'
+        })
 });
 
 module.exports = {
     createUserSchema,
     loginUserSchema,
-    resetVerificationLinkSchema
+    resetVerificationLinkSchema,
+    resetPasswordSchema
 }
