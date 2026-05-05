@@ -12,4 +12,10 @@ router.get('/verify-email', AdminController.verifyEmail);
 router.post('/resend-verification-link', validate(resetVerificationLinkSchema), AdminController.resendVerificationLink);
 router.post('/resend-verification-link', validate(resetVerificationLinkSchema), AdminController.resendVerificationLink);
 
+
+// Scholarship routes
+router.post('/scholarship-types', AdminController.createScholarshipType);
+router.get('/scholarship-types', AdminController.getScholarshipTypes);
+router.put('/scholarship-types/:id', AdminController.updateScholarshipType);
+router.delete('/scholarship-types/:id', AdminController.deleteScholarshipType);
 module.exports = router;
