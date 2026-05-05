@@ -2,6 +2,8 @@ const jwtConfig = require('../../config/jwt');
 const User = require('../../models/admin/user'); 
 const jwt = require('jsonwebtoken');
 const bcrypt = require('bcrypt');
+const crypto = require('crypto');
+const emailService = require('../../utils/emailService');
 
 const login = async (body) => {
     let userInfo = await User.findByEmail(body.email);
@@ -72,8 +74,33 @@ const verifyEmail = async (token) => {
     return {message: 'Email verified successed'};
 }
 
+const resendVerificationLink = async (email) => {
+    let userInfo = await User.findByEmail(email);
+    if(userInfo.length === 0){
+        throw new Error('Email not found');
+    }
+
+    if(userInfo[0].is_verified){
+        throw new Error('Email already verified');
+    }
+
+    const verification_token = crypto.randomBytes(37).toString('hex');
+    const verification_expires = new Date(Date.now() + 60 * 60 * 1000); //60min or 1h
+
+    await User.resendVerificationLink({
+        id: userInfo[0].id,
+        verification_token,
+        verification_expires
+    })
+
+    await emailService.sendVerificationEmail(email, verification_token);
+    return {message: 'Verification email sent, Please check your inbox'};
+    
+}
+
 module.exports = {
     login,
     getMe,
     verifyEmail,
+    resendVerificationLink
 }
