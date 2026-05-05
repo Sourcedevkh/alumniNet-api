@@ -26,10 +26,10 @@ const changeStatus = async(req, res) =>{
     }
 }
 
-const resetPassword = async(req, res) => {
+const resetAdminPassword = async(req, res) => {
     try {
-        const id = req.params;
-        const newPassword = req.validateBody;
+        const id = req.params.id;
+        const newPassword = req.validateBody.newPassword;
 
         await authService.resetAdminPassword(id, newPassword);
         return sendResponse(res, 200, true, 'Admin password reset successed');
@@ -41,5 +41,5 @@ const resetPassword = async(req, res) => {
 module.exports = {
     register,
     changeStatus,
-    resetPassword
+    resetAdminPassword
 }

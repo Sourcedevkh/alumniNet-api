@@ -1,8 +1,9 @@
+const dbConfig = require('../config/db');
 const transporter = require('../config/mailler');
 
 // send verification link mail
 const sendVerificationEmail = async (to, token) => {
-  const verificationLink = `http://localhost:3000/api/admin/auth/verify-email?token=${token}`;
+  const verificationLink = `${dbConfig.appUrl}/api/admin/auth/verify-email?token=${token}`;
 
   await transporter.sendMail({
     from: `AlumniNet <noreply@alumninet.com>`,

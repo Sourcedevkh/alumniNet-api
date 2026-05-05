@@ -73,7 +73,7 @@ const verifyOTP = async (req, res) => {
 
 const resetPassword = async (req, res) => {
     try {
-        const { token, password } = req.body; 
+        const { token, password } = req.validateBody; 
         await authService.resetPWD(token, password); 
 
         return sendResponse(res, 200, true, 'Password reset successed');

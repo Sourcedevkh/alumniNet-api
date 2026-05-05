@@ -21,6 +21,7 @@ const login = async (body) => {
         throw new Error('Please verify your email before logging in');
     }
 
+    await User.updateLoginTime(userInfo[0].id);
     const token = jwt.sign(
         // payload
         {
