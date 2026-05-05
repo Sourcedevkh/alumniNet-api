@@ -5,7 +5,7 @@ const login = async (req, res) => {
     try {
         let arrs = req.validateBody;
         const result = await authService.login(arrs);
-        return sendResponse(res, 200, true, 'Login successed', result);
+        return sendResponse(res, 200, true, 'Login succeeded', result);
     } catch (error) {
         return sendResponse(res, 400, false, error.message);
     }
@@ -41,9 +41,20 @@ const resendVerificationLink = async (req, res) =>{
     }
 }
 
+const logout = async (req, res) => {
+    try {
+        let userId = req.user.id;
+        await authService.logout(userId);
+        return sendResponse(res, 200, true, 'Logout succeeded');
+    } catch (error) {
+        return sendResponse(res, 400, false, error.message);
+    }
+}
+
 module.exports = {
     login,
     getMe,
     verifyEmail,
-    resendVerificationLink
+    resendVerificationLink,
+    logout
 };
