@@ -98,9 +98,15 @@ const resendVerificationLink = async (email) => {
     
 }
 
+const logout = async (id) => {
+    await User.removeToken(id);
+    return true;
+}
+
 module.exports = {
     login,
     getMe,
     verifyEmail,
-    resendVerificationLink
+    resendVerificationLink,
+    logout
 }

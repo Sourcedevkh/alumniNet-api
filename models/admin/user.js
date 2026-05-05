@@ -35,6 +35,10 @@ const resendVerificationLink = async (body) => {
     await pool.query('UPDATE users SET verification_token = ?, verification_expires = ? WHERE id = ?', arrs);
 }
 
+const removeToken = async (id) => {
+    await pool.query('UPDATE users SET token = NULL WHERE id = ?', [id]);
+}
+
 module.exports = {
     findByEmail,
     findById,
@@ -42,5 +46,6 @@ module.exports = {
     verifyEmail,
     getToken,
     addToken,
-    resendVerificationLink
+    resendVerificationLink,
+    removeToken
 }
