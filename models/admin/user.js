@@ -30,11 +30,17 @@ const addToken = async (token, id) => {
     return result;
 }
 
+const resendVerificationLink = async (body) => {
+    let arrs = [body.verification_token, body.verification_expires, body.id];
+    await pool.query('UPDATE users SET verification_token = ?, verification_expires = ? WHERE id = ?', arrs);
+}
+
 module.exports = {
     findByEmail,
     findById,
     findByVerificationEmail,
     verifyEmail,
     getToken,
-    addToken
+    addToken,
+    resendVerificationLink
 }

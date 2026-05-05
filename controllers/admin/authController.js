@@ -32,8 +32,18 @@ const getMe = async (req, res) => {
     }
 }
 
+const resendVerificationLink = async (req, res) =>{
+    try {
+        let result = await authService.resendVerificationLink(req.validateBody.email);
+        return sendResponse(res, 200, true, result);
+    } catch (error) {
+        return sendResponse(res, 400, false, error.message);
+    }
+}
+
 module.exports = {
     login,
     getMe,
-    verifyEmail
+    verifyEmail,
+    resendVerificationLink
 };
