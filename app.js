@@ -8,7 +8,7 @@ const PORT = process.env.PORT;
 
 app.use(express.json());
 
-// Super-admin 
+// Super-admin
 const authRoute = require('./routes/super-admin/userRoute');
 
 // Admin
