@@ -57,6 +57,10 @@ const clearOTP = async (userId) => {
     return await pool.query('UPDATE users SET otp_code = NULL, otp_expires_at = NULL WHERE id = ?', [userId]);
 };
 
+const updateLoginTime = async (id) => {
+    await pool.query('UPDATE users SET last_login_at = NOW() WHERE id = ?', [id]);
+};
+
 
 module.exports = {
     findByEmail,
@@ -70,5 +74,6 @@ module.exports = {
     saveOTP,
     findByOTP,
     updatePassword,
-    clearOTP
+    clearOTP,
+    updateLoginTime
 }
