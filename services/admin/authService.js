@@ -3,7 +3,8 @@ const User = require('../../models/admin/user');
 const jwt = require('jsonwebtoken');
 const bcrypt = require('bcrypt');
 const crypto = require('crypto');
-const emailService = require('../../utils/emailService');
+const {sendOTPEmail} = require('../../utils/emailService');
+const {generateOTP, getOTPExpiry} = require('../../utils/generateOTP');
 
 const login = async (body) => {
     let userInfo = await User.findByEmail(body.email);
@@ -103,10 +104,87 @@ const logout = async (id) => {
     return true;
 }
 
+const requestOTP = async (email) => {
+    const user = await User.findByEmail(email);
+    if(user.length === 0) throw new Error('Email not found');
+
+    let userInfo = user[0];
+    if(!userInfo.is_verified) throw new Error('Please verify your email before requesting OTP');
+
+    let userName = userInfo.name;
+    console.log(userName);
+    
+    const otp = generateOTP();
+    const expiresAt = getOTPExpiry(10);
+
+    await User.saveOTP(email, otp, expiresAt);
+    await sendOTPEmail(email, otp, userName);
+    return true;
+}
+
+const verifyOTP = async (email, code) => {
+    const userRows = await User.findByEmail(email); 
+    
+    if (userRows.length === 0) {
+        throw new Error('Invalid OTP or OTP has expired');
+    }
+
+    const userInfo = userRows[0];
+    if (userInfo.otp_code === null) {
+        throw new Error('OTP already verified');
+    }
+
+    if (userInfo.otp_code !== code || new Date(userInfo.otp_expires_at) < new Date()) {
+        throw new Error('Invalid OTP or OTP has expired');
+    }
+    const reset_token = jwt.sign(
+        {
+            id: userInfo.id,
+            purpose: 'reset_password'
+        },
+        jwtConfig.secret,
+        { expiresIn: '10m' }
+    );
+    await User.clearOTP(userInfo.id);
+
+    return reset_token;
+};
+
+const resetPWD = async (token, newPassword) => {
+    try {
+        const decoded = jwt.verify(token, jwtConfig.secret);
+        
+        if (decoded.purpose !== 'reset_password') {
+            throw new Error('Invalid reset token');
+        }
+
+        const userRows = await User.findById(decoded.id);
+        const user = userRows[0];
+
+        if (!user) throw new Error("User no longer exists");
+
+        // check if token isused after PWD reset
+        const lastChanged = new Date(user.updated_at).getTime() / 1000;
+        if (decoded.iat < lastChanged) {
+            throw new Error('Password already reset');
+        }
+
+        const hashedPWD = await bcrypt.hash(newPassword, 10);
+        await User.updatePassword(decoded.id, hashedPWD);
+
+        return true;
+    } catch (error) {
+        throw new Error(error.message); 
+    }
+}
+
 module.exports = {
     login,
     getMe,
     verifyEmail,
     resendVerificationLink,
-    logout
+    logout,
+    requestOTP,
+    verifyOTP,
+    resetPWD
 }

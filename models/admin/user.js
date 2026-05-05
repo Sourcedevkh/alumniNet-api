@@ -1,13 +1,12 @@
 const pool = require('../../config/db');
 
 const findByEmail = async (email) => {
-    let [rows] = await pool.query('SELECT id, email, password, phone, address, role, is_active, is_verified FROM users WHERE email = ?', [email]);
+    let [rows] = await pool.query('SELECT id, name, email, password, phone, address, role, is_active, is_verified, otp_code, otp_expires_at FROM users WHERE email = ?', [email]);
     return rows;
 }
 
 const findById = async (id) => {
-    // do not select the token field when returning user profile
-    let [rows] = await pool.query('SELECT id, name, email, phone, address, role, is_active, is_verified FROM users WHERE id = ?', [id]);
+    let [rows] = await pool.query('SELECT id, name, email, phone, address, role, is_active, is_verified, updated_at FROM users WHERE id = ?',[id]);
     return rows;
 }
 
@@ -21,7 +20,7 @@ const getToken = async (token) => {
     return row;
 }
 
-const verifyEmail = async (id) =>{
+const verifyEmail = async (id) => {
     await pool.query('UPDATE users SET is_verified = 1 WHERE id = ?', [id]);
 }
 
@@ -39,6 +38,26 @@ const removeToken = async (id) => {
     await pool.query('UPDATE users SET token = NULL WHERE id = ?', [id]);
 }
 
+
+const saveOTP = async (email, code, expiresAt) => {
+    let arrs = [code, expiresAt, email];
+    return await pool.query('UPDATE users SET otp_code = ?, otp_expires_at = ? WHERE email = ?', arrs);
+}
+
+const findByOTP = async (email, code) => {
+    const [rows] = await pool.query('SELECT id, is_verified FROM users WHERE email = ? AND otp_code = ? AND otp_expires_at > NOW()', [email, code]);
+    return rows;
+}
+
+const updatePassword = async (id, hashedPassword) => {
+    return await pool.query('UPDATE users SET password = ?, otp_code = NULL, otp_expires_at = NULL, updated_at = NOW() WHERE id = ?', [hashedPassword, id]);
+}
+
+const clearOTP = async (userId) => {
+    return await pool.query('UPDATE users SET otp_code = NULL, otp_expires_at = NULL WHERE id = ?', [userId]);
+};
+
+
 module.exports = {
     findByEmail,
     findById,
@@ -47,5 +66,9 @@ module.exports = {
     getToken,
     addToken,
     resendVerificationLink,
-    removeToken
+    removeToken,
+    saveOTP,
+    findByOTP,
+    updatePassword,
+    clearOTP
 }
