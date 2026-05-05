@@ -1,19 +1,25 @@
 const jwt = require('jsonwebtoken');
 const jwtConfig = require('../config/jwt');
 const User = require('../models/admin/user');
-const { sendResponse } = require('../utils/responseHelper');
-
 
 const isLogin = async (req, res, next) => {
     try {
         const authHeader = req.headers.authorization;
-        if (!authHeader){
-            return sendResponse(res, 401, false, 'You needs to login');
+        console.log(authHeader);
+        if (!authHeader) {
+            return res.json({
+                result: false,
+                msg: 'You need to login'
+            })
         }
 
         let parts = authHeader.split(' ');
-        if(parts.length !== 2 || parts[0] !== 'Bearer'){
-            return sendResponse(res, 401, false, 'Invalid token');
+        console.log(parts);
+        if (parts.length !== 2 || parts[0] !== 'Bearer') {
+            return res.json({
+                result: false,
+                msg: 'Invalid Token'
+            })
         }
 
         let token = parts[1];
@@ -29,13 +35,17 @@ const isLogin = async (req, res, next) => {
         }
 
         req.user = decode;
+
         next();
-        
+
     } catch (error) {
-        return sendResponse(res, 401, false, error.message);
+        return res.status(401).json({
+            result: false,
+            msg: 'Invalid Token or Token Expired'
+        })
     }
-};
+}
 
 module.exports = {
     isLogin
-};
+}
