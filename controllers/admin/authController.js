@@ -20,6 +20,18 @@ const verifyEmail = async (req, res) => {
     }
 }
 
+const getMe = async (req, res) => {
+    try {
+        const userId = req.user.id;
+        
+        const userData = await authService.getMe(userId);
+        
+        return sendResponse(res, 200, true, 'User information', userData);
+    } catch (error) {
+        return sendResponse(res, 400, false, error.message);
+    }
+}
+
 const resendVerificationLink = async (req, res) =>{
     try {
         let result = await authService.resendVerificationLink(req.validateBody.email);
