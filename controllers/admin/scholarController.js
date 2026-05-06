@@ -41,9 +41,30 @@ const deleteScholarshipType = async (req, res) => {
     }
 }
 
+const createScholarshipSubject = async (req, res) => {
+    try {
+        let arrs = req.body;
+        let result = await scholarService.createScholarshipSubject(arrs);
+        return sendResponse(res, 201, true, 'Scholarship subject created successfully', result);
+    }catch (error) {
+        return sendResponse(res, 400, false, error.message);
+    }
+}
+
+const getAllScholarshipSubjects = async (req, res) =>  {
+    try {
+        let result = await scholarService.getAllScholarshipSubjects();
+        return sendResponse(res, 200, true, 'Scholarship subjects retrieved successfully', result);
+    }catch (error) {
+        return sendResponse(res, 400, false, error.message);
+    }
+}
+
 module.exports = {
     createScholarshipType,
     getScholarshipTypes,
     updateScholarshipType,
-    deleteScholarshipType
+    deleteScholarshipType,
+    createScholarshipSubject,
+    getAllScholarshipSubjects
 }

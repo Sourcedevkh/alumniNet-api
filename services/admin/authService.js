@@ -44,15 +44,6 @@ const login = async (body) => {
         token: token
     }
 }
-
-const getMe = async (id) => {
-    let data = await User.findById(id);
-    if(data.length === 0){
-        throw new Error('User not found');
-    }
-    
-    return data[0];
-}
     
 const verifyEmail = async (token) => {
     if(!token){
@@ -112,7 +103,7 @@ const requestOTP = async (email) => {
     let userInfo = user[0];
     if(!userInfo.is_verified) throw new Error('Please verify your email before requesting OTP');
 
-    let userName = userInfo.name;
+    let userName = userInfo.fullname;
     console.log(userName);
     
     const otp = generateOTP();
@@ -159,7 +150,7 @@ const resetPWD = async (token, newPassword) => {
 
         // hash the new password
         const hashedPWD = await bcrypt.hash(newPassword, 10);
-        
+
         await User.updatePassword(user.id, hashedPWD);
 
         return true;
@@ -170,7 +161,6 @@ const resetPWD = async (token, newPassword) => {
 
 module.exports = {
     login,
-    getMe,
     verifyEmail,
     resendVerificationLink,
     logout,
