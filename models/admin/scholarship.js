@@ -1,4 +1,4 @@
-const pool = require('../../config/db');
+const { pool } = require('../../config/db');
 
 const getScholar_types = async () => {
     let [rows] = await pool.query('SELECT * FROM scholarship_types');
