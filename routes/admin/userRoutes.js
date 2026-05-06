@@ -7,7 +7,6 @@ const {loginUserSchema, resetVerificationLinkSchema, emailSchema, verifyOTPSchem
 const { isLogin } = require('../../middlewares/auth');
 
 router.post('/login', validate(loginUserSchema), AdminController.login);
-router.get('/me', isLogin, AdminController.getMe);
 router.get('/verify-email', AdminController.verifyEmail);
 router.post('/resend-verification-link', validate(resetVerificationLinkSchema), AdminController.resendVerificationLink);
 router.delete('/logout', isLogin, AdminController.logout);
