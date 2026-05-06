@@ -24,7 +24,7 @@ const updateScholarshipType = async (req, res) => {
     try {
         let id = req.params.id;
         let body = req.body;
-        let result = await authService.updateScholarshipType(id,body);
+        let [result] = await authService.updateScholarshipType(id,body);
         return sendResponse(res, 200, true, 'Scholarship type updated successfully', result);
     }catch (error) {
         return sendResponse(res, 400, false, error.message);

@@ -2,6 +2,8 @@ const express = require('express');
 const router = express.Router();
 
 const AdminController = require('../../controllers/admin/scholarController');
+
+// Scholarship Type routes
 router.post('/scholarship-types', AdminController.createScholarshipType);
 router.get('/scholarship-types', AdminController.getScholarshipTypes);
 router.put('/scholarship-types/:id', AdminController.updateScholarshipType);
