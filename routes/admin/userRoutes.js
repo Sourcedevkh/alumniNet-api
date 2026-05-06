@@ -10,9 +10,9 @@ router.post('/login', validate(loginUserSchema), AdminController.login);
 router.get('/verify-email', AdminController.verifyEmail);
 router.post('/resend-verification-link', validate(resetVerificationLinkSchema), AdminController.resendVerificationLink);
 router.delete('/logout', isLogin, AdminController.logout);
-router.post('/forgot-password', validate(emailSchema), AdminController.forgotPWD);
-router.post('/verify-otp', validate(verifyOTPSchema), AdminController.verifyOTP);
-router.post('/reset-password', validate(resetPasswordSchema), AdminController.resetPassword);
+router.post('/forgot-password', isLogin, validate(emailSchema), AdminController.forgotPWD);
+router.post('/verify-otp',isLogin, validate(verifyOTPSchema), AdminController.verifyOTP);
+router.post('/reset-password', isLogin, validate(resetPasswordSchema), AdminController.resetPassword);
 
 
 module.exports = router;
