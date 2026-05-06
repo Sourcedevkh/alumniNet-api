@@ -41,9 +41,10 @@ const resendVerificationLink = async (req, res) =>{
     }
 }
 
+
 module.exports = {
     login,
     getMe,
     verifyEmail,
-    resendVerificationLink
+    resendVerificationLink,
 };
