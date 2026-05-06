@@ -6,6 +6,11 @@ const pool = mysql.createPool({
     password: process.env.DB_PASSWORD,
     database: process.env.DB_NAME,
     port: process.env.DB_PORT,
-})
+});
 
-module.exports = pool;
+const appUrl = process.env.APP_URL;
+
+module.exports = {
+    pool,
+    appUrl
+};

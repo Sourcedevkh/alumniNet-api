@@ -3,7 +3,8 @@ const User = require('../../models/admin/user');
 const jwt = require('jsonwebtoken');
 const bcrypt = require('bcrypt');
 const crypto = require('crypto');
-const emailService = require('../../utils/emailService');
+const {sendOTPEmail} = require('../../utils/emailService');
+const {generateOTP, getOTPExpiry} = require('../../utils/generateOTP');
 
 const login = async (body) => {
     let userInfo = await User.findByEmail(body.email);
@@ -20,6 +21,7 @@ const login = async (body) => {
         throw new Error('Please verify your email before logging in');
     }
 
+    await User.updateLoginTime(userInfo[0].id);
     const token = jwt.sign(
         // payload
         {
@@ -98,62 +100,81 @@ const resendVerificationLink = async (email) => {
     
 }
 
-const getScholarships = async () => {
-    let rows = await User.getScholar_types();
-
-    return rows;
+const logout = async (id) => {
+    await User.removeToken(id);
+    return true;
 }
 
-const createScholarshipType = async (body) => {
+const requestOTP = async (email) => {
+    const user = await User.findByEmail(email);
+    if(user.length === 0) throw new Error('Email not found');
 
-    if (!body.name) {
-        throw new Error('Name is required');
-    }
-    let name = body.name.trim();
-    let existing = await User.findScholarshipTypeByName(name);
-    if (existing.length > 0) {
-        throw new Error('Scholarship type already exists');
-    }
+    let userInfo = user[0];
+    if(!userInfo.is_verified) throw new Error('Please verify your email before requesting OTP');
 
-    let result = await User.createScholarshipType({ name });
-    return result;
+    let userName = userInfo.name;
+    console.log(userName);
+    
+    const otp = generateOTP();
+    const expiresAt = getOTPExpiry(10);
+
+    await User.saveOTP(email, otp, expiresAt);
+    await sendOTPEmail(email, otp, userName);
+    return true;
 }
 
+const verifyOTP = async (email, code) => {
+    const userRows = await User.findByEmail(email); 
+    
+    if (userRows.length === 0) {
+        throw new Error('Invalid OTP or OTP has expired');
+    }
 
-const updateScholarshipType = async (id, body) => {
-    if (!body.name) {
-        throw new Error ('Name is required');
+    const userInfo = userRows[0];
+    if (userInfo.otp_code === null) {
+        throw new Error('OTP already verified');
     }
-    if (body.name.trim() === '') {
-        throw new Error('Name Scholarship not found');
-    }
-    let name = body.name.trim();
-    let existing = await User.findScholarshipTypeByName(name);
-    if (existing.length > 0 && existing[0].id !== parseInt(id)) {
-        throw new Error('Scholarship type already exists');
-    }
-    let result = await User.updateScholarshipType(id, { name });
 
-    if (result.length === 0) {
-        throw new Error('Scholarship type ID not found');
+    if (userInfo.otp_code === null || userInfo.otp_code !== code || new Date(userInfo.otp_expires_at) < new Date()) {
+        throw new Error('Invalid OTP or OTP has expired');
     }
-    return result;
+
+    // Generate shortToken 32-character hex string
+    const reset_token = crypto.randomBytes(16).toString('hex');
+    await User.saveResetToken(userInfo.id, reset_token);
+    
+    await User.clearOTP(userInfo.id);
+
+    return reset_token;
+};
+
+const resetPWD = async (token, newPassword) => {
+    try {
+        const userRows = await User.findByResetToken(token);
+        const user = userRows[0];
+
+        if (!user) {
+            throw new Error('Invalid or expired reset token');
+        }
+
+        // hash the new password
+        const hashedPWD = await bcrypt.hash(newPassword, 10);
+        
+        await User.updatePassword(user.id, hashedPWD);
+
+        return true;
+    } catch (error) {
+        throw new Error(error.message); 
+    }
 }
 
-const deleteScholarshipType = async (id) => {
-    let result = await User.deleteScholarshipType(id);
-    if (result.affectedRows === 0) {
-        throw new Error('Scholarship type ID not found');
-    }
-    return result[0];
-}
 module.exports = {
     login,
     getMe,
     verifyEmail,
     resendVerificationLink,
-    getScholarships,
-    createScholarshipType,
-    updateScholarshipType,
-    deleteScholarshipType
+    logout,
+    requestOTP,
+    verifyOTP,
+    resetPWD
 }

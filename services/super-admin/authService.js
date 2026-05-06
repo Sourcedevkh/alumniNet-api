@@ -42,15 +42,15 @@ const adminStatus = async (id, status) => {
 }
 
 const resetAdminPassword = async (id, newPassword) =>{
-    const admin = await User.findById(id);
-    if(admin.length === 0){
+    const adminRows = await User.findById(id);
+    if(adminRows.length === 0){
         throw new Error('Admin account not found');        
     }
 
     const hashedPWD = await bycrypt.hash(newPassword, 10);
     await User.updatePassword(id, hashedPWD);
 
-    return {id: id, email: admin[0].email};
+    return {id: id, email: adminRows[0].email};
 }
 
 module.exports = {

@@ -1,4 +1,4 @@
-const pool = require('../../config/db');
+const { pool } = require('../../config/db');
 
 const create = async (body) => {
     let arrs = [body.name, body.email, body.password, body.verificationToken, body.verificationExpires];
@@ -22,7 +22,7 @@ const updateStatus = async (id, status) => {
 } 
 
 const updatePassword = async(id, hashedPassword) => {
-    let [result] = await pool.query('UPDATE users SET password = ? WHERE id = ?', [hashedPassword, id]);
+    let [result] = await pool.query('UPDATE users SET password = ?, updated_at = NOW() WHERE id = ?', [hashedPassword, id]);
     return result.affectedRows;
 }
 

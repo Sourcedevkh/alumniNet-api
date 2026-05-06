@@ -1,13 +1,12 @@
-const pool = require('../../config/db');
+const { pool } = require('../../config/db');
 
 const findByEmail = async (email) => {
-    let [rows] = await pool.query('SELECT id, email, password, phone, address, role, is_active, is_verified FROM users WHERE email = ?', [email]);
+    let [rows] = await pool.query('SELECT id, name, email, password, phone, address, role, is_active, is_verified, otp_code, otp_expires_at FROM users WHERE email = ?', [email]);
     return rows;
 }
 
 const findById = async (id) => {
-    // do not select the token field when returning user profile
-    let [rows] = await pool.query('SELECT id, name, email, phone, address, role, is_active, is_verified FROM users WHERE id = ?', [id]);
+    let [rows] = await pool.query('SELECT id, name, email, phone, address, role, is_active, is_verified, updated_at FROM users WHERE id = ?',[id]);
     return rows;
 }
 
@@ -35,38 +34,44 @@ const resendVerificationLink = async (body) => {
     await pool.query('UPDATE users SET verification_token = ?, verification_expires = ? WHERE id = ?', arrs);
 }
 
-const getScholar_types = async () => {
-    let [rows] = await pool.query('SELECT * FROM scholarship_types');
-    return rows;
-}
-
-const findScholarshipTypeByName = async (name) => {
-    let [rows] = await pool.query('SELECT * FROM scholarship_types WHERE name = ?', [name]);
-    return rows;
+const removeToken = async (id) => {
+    await pool.query('UPDATE users SET token = NULL WHERE id = ?', [id]);
 }
 
 
-const createScholarshipType = async (body) => {
-    let arrs = [body.name];
-    let [results] = await pool.query('INSERT INTO scholarship_types (name) VALUES (?)', arrs);
-    const [rows] = await pool.query('SELECT id, name, created_at FROM scholarship_types WHERE id = ?',[results.insertId]);
+const saveOTP = async (email, code, expiresAt) => {
+    let arrs = [code, expiresAt, email];
+    return await pool.query('UPDATE users SET otp_code = ?, otp_expires_at = ? WHERE email = ?', arrs);
+}
 
+const findByOTP = async (email, code) => {
+    const [rows] = await pool.query('SELECT id, is_verified FROM users WHERE email = ? AND otp_code = ? AND otp_expires_at > NOW()', [email, code]);
     return rows;
 }
 
-const updateScholarshipType = async (id, body) => {
-    let arrs = [body.name, id];
-    let [results] = await pool.query('UPDATE scholarship_types SET name = ? WHERE id = ?', arrs);
-    let [rows] = await pool.query('SELECT id, name, created_at FROM scholarship_types WHERE id = ?',[id]);
+const updatePassword = async (id, hashedPassword) => {
+    let data = [hashedPassword, id];
+    return await pool.query(`UPDATE users SET password = ?, reset_token = NULL, token = NULL, updated_at = NOW() WHERE id = ?`, data);
+}
 
+const clearOTP = async (userId) => {
+    return await pool.query('UPDATE users SET otp_code = NULL, otp_expires_at = NULL WHERE id = ?', [userId]);
+};
+
+const updateLoginTime = async (id) => {
+    await pool.query('UPDATE users SET last_login_at = NOW() WHERE id = ?', [id]);
+};
+
+const saveResetToken = async (id, token) => {
+    const [result] = await pool.query('UPDATE users SET reset_token = ?, updated_at = NOW() WHERE id = ?', [token, id]);
+    return result.affectedRows > 0;
+}
+
+const findByResetToken = async (token) => {
+    const [rows] = await pool.query('SELECT id, email FROM users WHERE reset_token = ?', [token]);
     return rows;
 }
 
-const deleteScholarshipType = async (id) => {
-    let [rows] = await pool.query('DELETE FROM scholarship_types WHERE id = ?', [id]);
-
-    return rows;
-}
 module.exports = {
     findByEmail,
     findById,
@@ -75,9 +80,12 @@ module.exports = {
     getToken,
     addToken,
     resendVerificationLink,
-    findScholarshipTypeByName,
-    createScholarshipType,
-    getScholar_types,
-    updateScholarshipType,
-    deleteScholarshipType
+    removeToken,
+    saveOTP,
+    findByOTP,
+    updatePassword,
+    clearOTP,
+    updateLoginTime,
+    saveResetToken,
+    findByResetToken
 }
