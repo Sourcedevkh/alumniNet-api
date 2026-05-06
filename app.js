@@ -14,9 +14,13 @@ const authRoute = require('./routes/super-admin/userRoute');
 // Admin
 const authAdminRoute = require('./routes/admin/userRoutes');
 
+// Student
+const studentRoute = require('./routes/admin/studentRoutes');
+
 
 app.use('/api/auth', authRoute);
 app.use('/api/admin/auth', authAdminRoute);
+app.use('/api/admin/student', studentRoute);
 
 app.listen(PORT, () => {
     console.log(`Service running on port ${PORT}`);
