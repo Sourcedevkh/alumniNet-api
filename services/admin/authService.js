@@ -109,7 +109,6 @@ const createScholarshipType = async (body) => {
     if (!body.name) {
         throw new Error('Name is required');
     }
-
     let name = body.name.trim();
     let existing = await User.findScholarshipTypeByName(name);
     if (existing.length > 0) {
