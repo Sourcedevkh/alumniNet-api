@@ -50,9 +50,43 @@ const deleteScholarshipType = async (id) => {
     return result[0];
 }
 
+
+const createScholarshipSubject = async (body) => {
+    let { name, type_id } = body;
+    if (!name || !type_id) {
+        throw new Error('Name and type_id are required');
+    }
+
+     name = name.trim();
+    if (name === '') {
+        throw new Error('Scholarship subject name cannot be empty');
+    }
+    let type = await Scholarship.checkTypeIdExist(type_id);
+    if (type.length === 0) {
+        throw new Error('Scholarship type ID not found');
+    }
+
+    let result = await Scholarship.createScholarshipSubject({
+        name,
+        type_id
+    });
+    return {
+        id: result.insertId,
+        name,
+        type_id
+    };
+};
+
+const getAllScholarshipSubjects = async () => {
+    let rows = await Scholarship.getAllScholarshipSubjects();
+    
+    return rows;
+}
 module.exports = {
     getScholarships,
     createScholarshipType,
     updateScholarshipType,
-    deleteScholarshipType
+    deleteScholarshipType,
+    createScholarshipSubject,
+    getAllScholarshipSubjects
 }

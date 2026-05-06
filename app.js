@@ -19,7 +19,7 @@ const scholarshipRoute = require('./routes/admin/scholarshipRoutes');
 
 app.use('/api/auth', authRoute);
 app.use('/api/admin/auth', authAdminRoute);
-app.use('/api/admin', scholarshipRoute);
+app.use('/api/scholarship', scholarshipRoute);
 app.listen(PORT, () => {
     console.log(`Service running on port ${PORT}`);
 });
