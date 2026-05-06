@@ -33,11 +33,40 @@ const deleteScholarshipType = async (id) => {
     return rows;
 }
 
+const getAllScholarshipSubjects = async () => {
+    let [rows] = await pool.query('SELECT ss.*, st.name AS type_name FROM scholarship_subtypes ss JOIN scholarship_types st ON ss.type_id = st.id ORDER BY ss.id DESC')
+    return rows;
+}
+
+const checkTypeIdExist = async (type_id) => {
+    let [rows] = await pool.query('SELECT id FROM scholarship_types WHERE id = ?', [type_id]);
+    return rows;
+}
+
+const createScholarshipSubject = async (body) => {
+    const [result] = await pool.query(
+        'INSERT INTO scholarship_subtypes (type_id, name) VALUES (?, ?)',
+        [body.type_id, body.name]
+    );
+
+    const [rows] = await pool.query(`
+        SELECT ss.*, st.name AS type_name 
+        FROM scholarship_subtypes ss
+        JOIN scholarship_types st ON ss.type_id = st.id
+        WHERE ss.id = ?
+    `, [result.insertId]);
+
+    return rows[0]; 
+};
+
 
 module.exports = {
     findScholarshipTypeByName,
     createScholarshipType,
     getScholar_types,
     updateScholarshipType,
-    deleteScholarshipType
+    deleteScholarshipType,
+    getAllScholarshipSubjects,
+    createScholarshipSubject,
+    checkTypeIdExist
 }
