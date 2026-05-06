@@ -1,13 +1,13 @@
 const Joi = require('joi');
 
 const createUserSchema = Joi.object({
-    name: Joi.string()
+    fullname: Joi.string()
         .min(3)
         .max(50)
         .required()
         .messages({
-            'string.min': 'Name must be at least 3 characters long',
-            'any.required': 'Name is required'
+            'string.min': 'Fullname must be at least 3 characters long',
+            'any.required': 'Fullname is required'
         }),
     email: Joi.string()
         .email()
