@@ -1,4 +1,4 @@
-const pool = require('../../config/db');
+const { pool } = require('../../config/db');
 
 const create = async (body) => {
     let arrs = [body.name, body.email, body.password, body.verificationToken, body.verificationExpires];
