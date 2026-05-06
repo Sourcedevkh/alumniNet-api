@@ -22,7 +22,7 @@ const verifyEmail = async (req, res) => {
 
 const getMe = async (req, res) => {
     try {
-        const userId = req.user.id; 
+        const userId = req.user.id;
         
         const userData = await authService.getMe(userId);
         
