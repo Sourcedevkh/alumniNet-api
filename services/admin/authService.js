@@ -44,15 +44,6 @@ const login = async (body) => {
         token: token
     }
 }
-
-const getMe = async (id) => {
-    let data = await User.findById(id);
-    if(data.length === 0){
-        throw new Error('User not found');
-    }
-    
-    return data[0];
-}
     
 const verifyEmail = async (token) => {
     if(!token){
@@ -159,7 +150,7 @@ const resetPWD = async (token, newPassword) => {
 
         // hash the new password
         const hashedPWD = await bcrypt.hash(newPassword, 10);
-        
+
         await User.updatePassword(user.id, hashedPWD);
 
         return true;
@@ -170,7 +161,6 @@ const resetPWD = async (token, newPassword) => {
 
 module.exports = {
     login,
-    getMe,
     verifyEmail,
     resendVerificationLink,
     logout,
