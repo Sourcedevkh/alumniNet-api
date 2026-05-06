@@ -15,4 +15,5 @@ router.post('/forgot-password', validate(emailSchema), AdminController.forgotPWD
 router.post('/verify-otp', validate(verifyOTPSchema), AdminController.verifyOTP);
 router.post('/reset-password', validate(resetPasswordSchema), AdminController.resetPassword);
 
+
 module.exports = router;
