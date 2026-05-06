@@ -103,7 +103,7 @@ const requestOTP = async (email) => {
     let userInfo = user[0];
     if(!userInfo.is_verified) throw new Error('Please verify your email before requesting OTP');
 
-    let userName = userInfo.name;
+    let userName = userInfo.fullname;
     console.log(userName);
     
     const otp = generateOTP();
