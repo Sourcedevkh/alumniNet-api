@@ -1,17 +1,17 @@
-const pool = require('../../config/db');
+const { pool } = require('../../config/db');
 
 const findByEmail = async (email) => {
-    let [rows] = await pool.query('SELECT id, name, email, password, phone, address, role, is_active, is_verified, otp_code, otp_expires_at FROM users WHERE email = ?', [email]);
+    let [rows] = await pool.query('SELECT id, fullname, email, password, phone, address, role, is_active, is_verified, otp_code, otp_expires_at FROM users WHERE email = ?', [email]);
     return rows;
 }
 
 const findById = async (id) => {
-    let [rows] = await pool.query('SELECT id, name, email, phone, address, role, is_active, is_verified, updated_at FROM users WHERE id = ?',[id]);
+    let [rows] = await pool.query('SELECT id, fullname, email, phone, address, role, is_active, is_verified, updated_at FROM users WHERE id = ?',[id]);
     return rows;
 }
 
 const findByVerificationEmail = async (token) => {
-    let [rows] = await pool.query('SELECT id, name, email, phone, address, role, is_active, token, is_verified, verification_token, verification_expires FROM users WHERE verification_token = ?', [token]);
+    let [rows] = await pool.query('SELECT id, fullname, email, phone, address, role, is_active, token, is_verified, verification_token, verification_expires FROM users WHERE verification_token = ?', [token]);
     return rows;
 }
 
@@ -50,7 +50,8 @@ const findByOTP = async (email, code) => {
 }
 
 const updatePassword = async (id, hashedPassword) => {
-    return await pool.query('UPDATE users SET password = ?, otp_code = NULL, otp_expires_at = NULL, updated_at = NOW() WHERE id = ?', [hashedPassword, id]);
+    let data = [hashedPassword, id];
+    return await pool.query(`UPDATE users SET password = ?, reset_token = NULL, token = NULL, updated_at = NOW() WHERE id = ?`, data);
 }
 
 const clearOTP = async (userId) => {
@@ -61,6 +62,15 @@ const updateLoginTime = async (id) => {
     await pool.query('UPDATE users SET last_login_at = NOW() WHERE id = ?', [id]);
 };
 
+const saveResetToken = async (id, token) => {
+    const [result] = await pool.query('UPDATE users SET reset_token = ?, updated_at = NOW() WHERE id = ?', [token, id]);
+    return result.affectedRows > 0;
+}
+
+const findByResetToken = async (token) => {
+    const [rows] = await pool.query('SELECT id, email FROM users WHERE reset_token = ?', [token]);
+    return rows;
+}
 
 module.exports = {
     findByEmail,
@@ -75,5 +85,7 @@ module.exports = {
     findByOTP,
     updatePassword,
     clearOTP,
-    updateLoginTime
+    updateLoginTime,
+    saveResetToken,
+    findByResetToken
 }

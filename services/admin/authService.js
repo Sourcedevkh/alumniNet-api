@@ -44,15 +44,6 @@ const login = async (body) => {
         token: token
     }
 }
-
-const getMe = async (id) => {
-    let data = await User.findById(id);
-    if(data.length === 0){
-        throw new Error('User not found');
-    }
-    
-    return data[0];
-}
     
 const verifyEmail = async (token) => {
     if(!token){
@@ -112,7 +103,7 @@ const requestOTP = async (email) => {
     let userInfo = user[0];
     if(!userInfo.is_verified) throw new Error('Please verify your email before requesting OTP');
 
-    let userName = userInfo.name;
+    let userName = userInfo.fullname;
     console.log(userName);
     
     const otp = generateOTP();
@@ -135,17 +126,14 @@ const verifyOTP = async (email, code) => {
         throw new Error('OTP already verified');
     }
 
-    if (userInfo.otp_code !== code || new Date(userInfo.otp_expires_at) < new Date()) {
+    if (userInfo.otp_code === null || userInfo.otp_code !== code || new Date(userInfo.otp_expires_at) < new Date()) {
         throw new Error('Invalid OTP or OTP has expired');
     }
-    const reset_token = jwt.sign(
-        {
-            id: userInfo.id,
-            purpose: 'reset_password'
-        },
-        jwtConfig.secret,
-        { expiresIn: '10m' }
-    );
+
+    // Generate shortToken 32-character hex string
+    const reset_token = crypto.randomBytes(16).toString('hex');
+    await User.saveResetToken(userInfo.id, reset_token);
+    
     await User.clearOTP(userInfo.id);
 
     return reset_token;
@@ -153,25 +141,17 @@ const verifyOTP = async (email, code) => {
 
 const resetPWD = async (token, newPassword) => {
     try {
-        const decoded = jwt.verify(token, jwtConfig.secret);
-        
-        if (decoded.purpose !== 'reset_password') {
-            throw new Error('Invalid reset token');
-        }
-
-        const userRows = await User.findById(decoded.id);
+        const userRows = await User.findByResetToken(token);
         const user = userRows[0];
 
-        if (!user) throw new Error("User no longer exists");
-
-        // check if token isused after PWD reset
-        const lastChanged = new Date(user.updated_at).getTime() / 1000;
-        if (decoded.iat < lastChanged) {
-            throw new Error('Password already reset');
+        if (!user) {
+            throw new Error('Invalid or expired reset token');
         }
 
+        // hash the new password
         const hashedPWD = await bcrypt.hash(newPassword, 10);
-        await User.updatePassword(decoded.id, hashedPWD);
+
+        await User.updatePassword(user.id, hashedPWD);
 
         return true;
     } catch (error) {
@@ -181,7 +161,6 @@ const resetPWD = async (token, newPassword) => {
 
 module.exports = {
     login,
-    getMe,
     verifyEmail,
     resendVerificationLink,
     logout,
