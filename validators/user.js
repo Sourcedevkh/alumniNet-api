@@ -105,6 +105,60 @@ const resetAdminSchema = Joi.object({
         }),
 });
 
+const createStudent = Joi.object({
+    name: Joi.string()
+        .min(3)
+        .max(50)
+        .required()
+        .messages({
+            'string.min': 'Name must be at least 3 characters long',
+            'any.required': 'Name is required'
+        }),
+    phone: Joi.string()
+        .min(7)
+        .pattern(/^[0-9]+$/)
+        .allow('', null)
+        .optional()
+        .messages({
+            'string.min': 'Phone number must be at least 7 characters long',
+            'string.pattern.base': 'Phone number must contain only digits' 
+        }),
+    gender: Joi.number()
+        .valid(0, 1)
+        .empty('')
+        .default(0)
+        .messages({
+            'any.only': 'Gender must be 0 (Male) or 1 (Female)'
+        }),
+    status: Joi.string()
+        // .valid('Graduate', 'Studying', 'Suspend')
+        .empty('')
+        .default('Graduate')
+        .messages({
+            'string.base': 'Status must be (Text)'
+        }),
+    generation_id: Joi.number()
+        .required()
+        .messages({
+            'any.required': 'Generation is required'
+        }),
+    scholarship_id: Joi.number()
+        .required()
+        .messages({
+            'any.required': 'Scholarship is required'
+        }),
+    class_id: Joi.number()
+        .required()
+        .messages({
+            'any.required': 'Class is required'
+        }),
+    shift_id: Joi.number()
+        .required()
+        .messages({
+            'any.required': 'Shift is required'
+        }),
+})
+
 module.exports = {
     createUserSchema,
     loginUserSchema,
@@ -113,5 +167,6 @@ module.exports = {
     resetPasswordSchema,
     codeOTPSchema,
     verifyOTPSchema,
-    resetAdminSchema
+    resetAdminSchema,
+    createStudent
 }
