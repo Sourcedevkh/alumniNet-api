@@ -4,9 +4,7 @@ const createGeneration = async (req, res) => {
   try {
     const body = req.body;
     const result = await generationService.createGeneration(body);
-    res
-      .status(201)
-      .json({
+    res.status(201).json({
         success: true,
         message: "Generation created successfully",
         data: result,

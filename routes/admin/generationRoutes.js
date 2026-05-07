@@ -1,10 +1,10 @@
-const express = require('express');
+const express = require("express");
 const router = express.Router();
 
-const generationController = require('../../controllers/admin/generationController');
+const validate = require("../../validators/generation");
 
-router.post('/create', generationController.createGeneration);
+const generationController = require("../../controllers/admin/generationController");
 
-
+router.post("/create",validate.validateCreateGeneration,generationController.createGeneration,);
 
 module.exports = router;
