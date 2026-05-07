@@ -16,11 +16,15 @@ const authAdminRoute = require('./routes/admin/userRoutes');
 const scholarshipRoute = require('./routes/admin/scholarshipRoutes');
 const profileRoute = require('./routes/admin/profileRoutes');
 
+const generationRoute = require('./routes/admin/generationRoutes');
+
 
 app.use('/api/auth', authRoute);
 app.use('/api/admin/auth', authAdminRoute);
 app.use('/api/admin/profile', profileRoute);
 app.use('/api/scholarship', scholarshipRoute);
+
+app.use('/api/generation', generationRoute);
 
 app.listen(PORT, () => {
     console.log(`Service running on port ${PORT}`);
