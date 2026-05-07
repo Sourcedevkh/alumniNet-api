@@ -60,11 +60,80 @@ const getAllScholarshipSubjects = async (req, res) =>  {
     }
 }
 
+const updateScholarshipSubject = async (req, res) => {
+    try {
+        let id = req.params.id;
+        let body = req.body;
+        let result = await scholarService.updateScholarshipSubject(id, body);
+        return sendResponse(res, 200, true, 'Scholarship subject updated successfully', result);
+    }catch (error) {
+        return sendResponse(res, 400, false, error.message);
+    }
+}
+
+const deleteScholarshipSubject = async (req, res) => {
+    try {
+        let id = req.params.id;
+        let result = await scholarService.deleteScholarshipSubject(id);
+        return sendResponse(res, 200, true, 'Delete Scholarship successfully', result);
+    }catch(error) {
+        return sendResponse(res, 400, false, error.message);
+    }
+}
+
+const createScholarshipTrack = async (req, res) => {
+    try {
+        let body = req.body;
+        let result = await scholarService.createScholarshipTrack(body);
+        return sendResponse(res, 200, true, 'Scholarship track created successfully', result);
+    }catch (error) {
+        return sendResponse(res, 400, false, error.message);
+    }
+}
+
+const getAllScholarshipTracks = async (req, res) => {
+    try {
+        let result = await scholarService.getAllScholarshipTracks();
+        return sendResponse(res, 200, true, 'Scholarship tracks retrieved successfully', result);
+    }catch (error) {
+        return sendResponse(res, 400, false, error.message)
+    }
+}
+
+const updateScholarshipTrack = async (req, res) => {
+    try {
+        let id = req.params.id;
+        let body = req.body;
+        let result = await scholarService.updateScholarshipTrack(id, body);
+        return sendResponse(res, 200, true, 'Scholarship track updated successfully', result);
+    }catch (error) {
+        return sendResponse(res, 400, false, error.message);
+    }
+}
+
+const deleteScholarshipTrack = async (req, res) => {
+    try {
+
+        let id = req.params.id;
+        let body = req.body;
+        let result = await scholarService.deleteScholarshipTrack(id, body);
+        return sendResponse(res, 200, true, 'Delete scholarship track successfully', result);
+    }catch (error) {
+        return sendResponse(res, 400, false, error.message);
+    }
+}
+
 module.exports = {
     createScholarshipType,
     getScholarshipTypes,
     updateScholarshipType,
     deleteScholarshipType,
     createScholarshipSubject,
-    getAllScholarshipSubjects
+    getAllScholarshipSubjects,
+    updateScholarshipSubject,
+    deleteScholarshipSubject,
+    createScholarshipTrack,
+    getAllScholarshipTracks,
+    updateScholarshipTrack,
+    deleteScholarshipTrack
 }
