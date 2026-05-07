@@ -1,14 +1,14 @@
 const { pool } = require("../../config/db");
 
 const createGeneration = async (body) => {
-    const arr = [body.name, body.description, body.start_year, body.end_year];
+    const arr = [body.name, body.description, body.start_year, body.end_year,body.intake_month];
     const [result] = await pool.query(
-        "INSERT INTO generations (name, description, start_year, end_year) VALUES (?, ?, ?, ?)",
+        "INSERT INTO generations (name, description, start_year, end_year, intake_month) VALUES (?, ?, ?, ?, ?)",
         arr,
     );
 
     const [rows] = await pool.query(
-        "SELECT id, name, description, start_year, end_year FROM generations WHERE id = ?",
+        "SELECT id, name, description, start_year, end_year, intake_month FROM generations WHERE id = ?",
         [result.insertId],
     );
     return rows;
