@@ -1,3 +1,4 @@
+const { pool } = require('../../config/db');
 const Scholarship = require('../../models/admin/scholarship');
 
 const getScholarships = async () => {
@@ -44,7 +45,7 @@ const updateScholarshipType = async (id, body) => {
 
 const deleteScholarshipType = async (id) => {
     let result = await Scholarship.deleteScholarshipType(id);
-    if (result.affectedRows === 0) {
+    if (result.length === 0) {
         throw new Error('Scholarship type ID not found');
     }
     return result[0];
@@ -66,10 +67,7 @@ const createScholarshipSubject = async (body) => {
         throw new Error('Scholarship type ID not found');
     }
 
-    let result = await Scholarship.createScholarshipSubject({
-        name,
-        type_id
-    });
+    let result = await Scholarship.createScholarshipSubject({name,type_id});
     return {
         id: result.insertId,
         name,
@@ -82,11 +80,102 @@ const getAllScholarshipSubjects = async () => {
     
     return rows;
 }
+
+const updateScholarshipSubject = async (id, body) => {
+    if(!body.name || !body.type_id){
+        throw new Error('Name and type_id are required');
+    }
+
+    let type = await Scholarship.checkTypeIdExist(body.type_id);
+    if(type.length === 0){
+        throw new Error('Scholarship type ID not found');
+    }
+
+    let result = await Scholarship.updateScholarshipSubject(id, body);
+    if(result.length === 0){
+        throw new Error('Scholarship subject ID not found');
+    }
+    return result;
+}
+
+const deleteScholarshipSubject = async (id) => {
+    if(!id) {
+        throw new Error('Scholarship subject ID is required');
+    }
+
+    let result = await Scholarship.deleteScholarshipSubject(id)
+    if (result.affectedRows === 0) {
+        throw new Error('Scholarship subject ID not found');
+    }
+    return result[0];
+}
+
+
+const createScholarshipTrack = async (body) => {
+    if(!body.subtype_id || !body.name){
+        throw new Error('subtype_id and name are required');
+    }
+
+    let subjectType = await Scholarship.checkTypeIdExist(body.subtype_id);
+    if(subjectType.length === 0) {
+        throw new Error('Scholarship subject type ID not found');
+    }
+
+    let existing = await Scholarship.findScholarshipTrackByName(body.name);
+    if(existing.length > 0) {
+        throw new Error('Scholarship track name already exists');
+    }
+    let result = await Scholarship.createScholarshipTrack(body);
+    return result;
+
+}
+const getAllScholarshipTracks = async () => {
+    let rows = await Scholarship.getAllScholarshipTracks();
+    return rows;
+}
+
+const updateScholarshipTrack = async (id, body) => {
+    if(!body.subtype_id || !body.name){
+        throw new Error('subtype_id and name are required');
+    }
+
+    let subjectType = await Scholarship.checkScholarshipTypeIdExist(body.subtype_id);
+    if(subjectType.length === 0) {
+        throw new Error('Scholarship subject type ID not found');
+    }
+
+    let existing = await Scholarship.findScholarshipTypeByName(body.name);
+    if(existing.length > 0) {
+        throw new Error('Scholarship track name already exists');
+    }
+
+    let result = await Scholarship.updateScholarshipTrack(id, body);
+    if(result.length === 0) {
+        throw new Error('Scholarship track ID not found');
+    }
+    return result;
+}
+
+
+
+const deleteScholarshipTrack = async (id, body) => {
+    let result = await Scholarship.deleteScholarshipTrack(id);
+    if(result.affectedRows === 0) {
+        throw new Error('Scholarship track ID not found');
+    }
+    return result[0];
+}
 module.exports = {
     getScholarships,
     createScholarshipType,
     updateScholarshipType,
     deleteScholarshipType,
     createScholarshipSubject,
-    getAllScholarshipSubjects
+    getAllScholarshipSubjects,
+    updateScholarshipSubject,
+    deleteScholarshipSubject,
+    createScholarshipTrack,
+    getAllScholarshipTracks,
+    updateScholarshipTrack,
+    deleteScholarshipTrack
 }

@@ -12,6 +12,13 @@ router.delete('/scholarship-types/:id', scholarshipController.deleteScholarshipT
 //Scholarship subject routes
 router.post('/scholarship-subjects', scholarshipController.createScholarshipSubject);
 router.get('/scholarship-subjects', scholarshipController.getAllScholarshipSubjects);
+router.put('/scholarship-subjects/:id', scholarshipController.updateScholarshipSubject);
+router.delete('/scholarship-subjects/:id', scholarshipController.deleteScholarshipSubject);
 
+// Scholarship Track routes
+router.post('/scholarship-tracks', scholarshipController.createScholarshipTrack);
+router.get('/scholarship-tracks', scholarshipController.getAllScholarshipTracks);
+router.put('/scholarship-tracks/:id', scholarshipController.updateScholarshipTrack);
+router.delete('/scholarship-tracks/:id', scholarshipController.deleteScholarshipTrack);
 
 module.exports = router;
