@@ -6,11 +6,17 @@ const findByName = async (name) => {
 }
 
 const create = async (data) => {
-    let arrs = [data.name, data.description, data.generation_id, data.scholarship_id, data.shift_id];
-    let [results] = await pool.query(
-        'INSERT INTO classes (name, description, generation_id, scholarship_id, shift_id) VALUES (?, ?, ?, ?, ?)',
-        arrs
-    );
+    const params = [
+        data.name,
+        data.description,
+        data.generation_id,
+        data.scholarship_id,
+        data.shift_id
+    ];
+
+    const sql = `INSERT INTO classes (name, description, generation_id, scholarship_id, shift_id) VALUES (?, ?, ?, ?, ?)`;
+
+    const [results] = await pool.query(sql, params);
     return results.insertId;
 }
 
@@ -90,18 +96,18 @@ const getAllClasses = async () => {
     return rows;
 };
 
-const update = async (id, data) =>{
+const update = async (id, data) => {
     let arrs = [data.name, data.description, data.generation_id, data.scholarship_id, data.shift_id, id];
     const sql = `UPDATE classes SET name = COALESCE(?, name), description = COALESCE(?, description), generation_id = COALESCE(?, generation_id), scholarship_id = COALESCE(?, scholarship_id), shift_id = COALESCE(?, shift_id) WHERE id = ?`;
     const [result] = await pool.query(sql, arrs);
     return result.affectedRows > 0;
 }
 
-module.exports = { 
-    findByName, 
-    create, 
-    getClassbyId, 
-    findById, 
-    getAllClasses, 
-    update 
+module.exports = {
+    findByName,
+    create,
+    getClassbyId,
+    findById,
+    getAllClasses,
+    update
 };
