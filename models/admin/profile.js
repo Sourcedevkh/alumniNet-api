@@ -5,16 +5,6 @@ const findById = async (id) => {
     return rows;
 }
 
-// this update query issuses
-// const updateProfile = async (id, body) => {
-//     let arrs = [body.fullname, body.gender, body.phone, body.address ?? null, id];
-    
-//     const sql = 'UPDATE users SET fullname = ?, gender = ?, phone = ?, address = ? WHERE id = ?';
-//     const [result] = await pool.query(sql, arrs);
-
-//     return result.affectedRows > 0;
-// }
-
 const updateProfile = async (id, body) => {
     let arrs = [body.fullname || null, body.gender ?? null, body.phone || null, body.address || null, id];
     const sql = `UPDATE users SET fullname = COALESCE(?, fullname), gender = COALESCE(?, gender), phone  = COALESCE(?, phone), address  = COALESCE(?, address) WHERE id = ?`;
