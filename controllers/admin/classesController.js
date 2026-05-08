@@ -12,8 +12,9 @@ const findById = async (req, res) => {
 
 const createClasses = async (req, res) => {
     try {
-        let { name, description, generation_id, scholarship_id, shift_id } = req.validateBody;
+        const { name, description, generation_id, scholarship_id, shift_id } = req.validateBody;
 
+        console.log({ name, generation_id, scholarship_id, shift_id });
         const newClassId = await classesService.createClasses({
             name,
             description,
@@ -22,10 +23,7 @@ const createClasses = async (req, res) => {
             shift_id
         });
 
-        return sendResponse(res, 201, true, 'Class created successed', {
-            id: newClassId,
-            name
-        });
+        return sendResponse(res, 201, true, 'Class created successed', { id: newClassId, name });
     } catch (error) {
         return sendResponse(res, 400, false, error.message);
     }
@@ -35,7 +33,7 @@ const getClassbyId = async (req, res) => {
     try {
         const { id } = req.params;
         const data = await classesService.getClassWithRoster(id);
-        return sendResponse(res, 200, true, 'Class retrieved successfully', data);
+        return sendResponse(res, 200, true, 'Class retrieved successed', data);
     } catch (error) {
         return sendResponse(res, 400, false, error.message);
     }
