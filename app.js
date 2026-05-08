@@ -17,6 +17,7 @@ const scholarshipRoute = require('./routes/admin/scholarshipRoutes');
 const profileRoute = require('./routes/admin/profileRoutes');
 const generationRoute = require('./routes/admin/generationRoutes');
 const studentRoute = require('./routes/admin/studentRoutes');
+const classRoute = require('./routes/admin/classesRoute');
 
 
 app.use('/api/auth', authRoute);
@@ -25,6 +26,7 @@ app.use('/api/admin/student', studentRoute);
 app.use('/api/admin/profile', profileRoute);
 app.use('/api/scholarship', scholarshipRoute);
 app.use('/api/generation', generationRoute);
+app.use('/api/admin/class', classRoute);
 
 app.listen(PORT, () => {
     console.log(`Service running on port ${PORT}`);
