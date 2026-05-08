@@ -106,7 +106,7 @@ const resetAdminSchema = Joi.object({
 });
 
 const createStudent = Joi.object({
-    name: Joi.string()
+    fullname: Joi.string()
         .min(3)
         .max(50)
         .required()
