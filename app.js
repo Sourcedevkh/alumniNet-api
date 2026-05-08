@@ -26,7 +26,7 @@ app.use('/api/admin/student', studentRoute);
 app.use('/api/admin/profile', profileRoute);
 app.use('/api/admin/score', scoreRoute);
 app.use('/api/scholarship', scholarshipRoute);
-app.use('/api/generation', generationRoute);
+app.use('/api/generations', generationRoute);
 
 app.listen(PORT, () => {
     console.log(`Service running on port ${PORT}`);

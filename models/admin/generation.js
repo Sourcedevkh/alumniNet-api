@@ -1,29 +1,36 @@
 const { pool } = require("../../config/db");
 
 const createGeneration = async (body) => {
-    const arr = [body.name, body.description, body.start_year, body.end_year,body.intake_month];
+    const arr = [body.name, body.description, body.start_year, body.end_year,body.scholarship_types,body.intake_month];
     const [result] = await pool.query(
-        "INSERT INTO generations (name, description, start_year, end_year, intake_month) VALUES (?, ?, ?, ?, ?)",
+        "INSERT INTO generations (name, description, start_year, end_year, scholarship_types, intake_month) VALUES (?, ?, ?, ?, ?, ?)",
         arr,
     );
 
     const [rows] = await pool.query(
-        "SELECT id, name, description, start_year, end_year, intake_month FROM generations WHERE id = ?",
+        "SELECT id, name, description, start_year, end_year, scholarship_types, intake_month FROM generations WHERE id = ?",
         [result.insertId],
     );
     return rows;
 };
 
 const findGenerationByid = async (id) => {
-    const [rows] = await pool.query(
-        `SELECT g.*, s.name AS scholarship_name, st.name AS track_name
-    FROM generations g
-    LEFT JOIN scholarships s ON g.scholarship_id = s.id
-    LEFT JOIN scholarship_tracks st ON s.track_id = st.id
-    WHERE g.id = ?`,
-        [id],
-    );
-    return rows;
+    const query = `
+        SELECT 
+            g.*, 
+            t.name AS scholarship_type_name,
+            st.name AS track_name
+        FROM generations g
+        
+        LEFT JOIN scholarships s ON g.scholarship_id = s.id 
+        LEFT JOIN scholarship_types t ON s.type_id = t.id 
+        
+        LEFT JOIN scholarship_tracks st ON g.track_id = st.id 
+        WHERE g.id = ?
+    `;
+
+    const [rows] = await pool.query(query, [id]);
+    return rows[0];
 };
 
 module.exports = {
