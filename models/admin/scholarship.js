@@ -10,6 +10,10 @@ const findScholarshipTypeByName = async (name) => {
     return rows;
 }
 
+const getScholarshipTypeById = async (id) => {
+    let [rows] = await pool.query('SELECT * FROM scholarship_types WHERE id = ?', [id]);
+    return rows;
+}
 
 const createScholarshipType = async (body) => {
     let arrs = [body.name];
@@ -172,6 +176,7 @@ const deleteScholarshipTrack = async (id) => {
 
 module.exports = {
     findScholarshipTypeByName,
+    getScholarshipTypeById,
     createScholarshipType,
     getScholar_types,
     updateScholarshipType,
