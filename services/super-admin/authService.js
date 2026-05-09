@@ -5,7 +5,7 @@ const User = require('../../models/super-admin/user');
 const emailService = require('../../utils/emailService');
 
 const create = async (body) => {
-    let {name, email, password} = body;
+    let {fullname, email, password} = body;
     let check_email = await User.findByEmail(email);
     if(check_email.length > 0){
         throw new Error('Email already exists');
@@ -17,7 +17,7 @@ const create = async (body) => {
     const verificationExpires = new Date(Date.now() + 15 * 60 * 1000); // 15 minutes
 
     let result = await User.create({
-        name: name,
+        fullname: fullname,
         email: email,
         password: hashedPWD,
         verificationToken: verificationToken,

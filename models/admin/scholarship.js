@@ -43,6 +43,10 @@ const checkTypeIdExist = async (type_id) => {
     return rows;
 }
 
+const findScholarshipSubjectByName = async (name) => {
+    let [rows] = await pool.query('SELECT * FROM scholarship_subtypes WHERE name = ?', [name]);
+    return rows;
+}
 const createScholarshipSubject = async (body) => {
     const [result] = await pool.query(
         'INSERT INTO scholarship_subtypes (type_id, name) VALUES (?, ?)',
@@ -183,5 +187,6 @@ module.exports = {
     getAllScholarshipTracks,
     checkScholarshipTypeIdExist,
     updateScholarshipTrack,
-    deleteScholarshipTrack
+    deleteScholarshipTrack,
+    findScholarshipSubjectByName
 }
