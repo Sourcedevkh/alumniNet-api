@@ -124,6 +124,54 @@ const deleteScholarshipTrack = async (req, res) => {
     }
 }
 
+const getAllScholarships = async (req, res) => {
+    try {
+        let result = await scholarService.getAllScholarshipsWithSubjects();
+        return sendResponse(res, 200, true, 'Scholarships retrieved successfully', result);
+    } catch (error) {
+        return sendResponse(res, 400, false, error.message);
+    }
+}
+
+const getScholarship = async (req, res) => {
+    try {
+        let id = req.params.id;
+        let result = await scholarService.getScholarshipDetails(id);
+        return sendResponse(res, 200, true, 'Scholarship retrieved successfully', result);
+    } catch (error) {
+        return sendResponse(res, 400, false, error.message);
+    }
+}
+
+const createScholarship = async (req, res) => {
+    try {
+        let result = await scholarService.createScholarshipWithSubjects(req.body);
+        return sendResponse(res, 201, true, 'Scholarship created successfully', result);
+    } catch (error) {
+        return sendResponse(res, 400, false, error.message);
+    }
+}
+
+const updateScholarship = async (req, res) => {
+    try {
+        let id = req.params.id;
+        let result = await scholarService.updateScholarshipWithSubjects(id, req.body);
+        return sendResponse(res, 200, true, 'Scholarship updated successfully', result);
+    } catch (error) {
+        return sendResponse(res, 400, false, error.message);
+    }
+}
+
+const deleteScholarship = async (req, res) => {
+    try {
+        let id = req.params.id;
+        let result = await scholarService.deleteScholarshipEntry(id);
+        return sendResponse(res, 200, true, 'Scholarship deleted successfully', result);
+    } catch (error) {
+        return sendResponse(res, 400, false, error.message);
+    }
+}
+
 module.exports = {
     createScholarshipType,
     getScholarshipTypes,
@@ -136,5 +184,10 @@ module.exports = {
     createScholarshipTrack,
     getAllScholarshipTracks,
     updateScholarshipTrack,
-    deleteScholarshipTrack
+    deleteScholarshipTrack,
+    getAllScholarships,
+    getScholarship,
+    createScholarship,
+    updateScholarship,
+    deleteScholarship
 }
