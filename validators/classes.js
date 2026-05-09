@@ -12,4 +12,15 @@ const classSchema = Joi.object({
     shift_id: Joi.number().integer().required().messages({'number.base': 'Shift ID must be a number',}),
 });
 
-module.exports = { classSchema };
+const statusSchema = Joi.object({
+    status: Joi.number().integer().valid(0, 1).required().messages({
+        'number.base': 'Status must be a number',
+        'any.required': 'Status is required',
+        'any.only': 'Status must be 0 (Closed) or 1 (Active)'
+    }),
+})
+
+module.exports = { 
+    classSchema,
+    statusSchema,
+};
