@@ -11,6 +11,7 @@ const createScholarshipType = async (req, res) => {
     }
 }
 
+
 const getScholarshipTypes = async (req, res) => {
     try {
         let result = await scholarService.getScholarships();

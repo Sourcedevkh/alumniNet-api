@@ -44,10 +44,15 @@ const updateScholarshipType = async (id, body) => {
 }
 
 const deleteScholarshipType = async (id) => {
-    let result = await Scholarship.deleteScholarshipType(id);
-    if (result.length === 0) {
+    if (!id) {
+        throw new Error('Scholarship type ID is required');
+    }
+
+    let checkId = await Scholarship.getScholarshipTypeById(id);
+    if (checkId.length === 0) {
         throw new Error('Scholarship type ID not found');
     }
+    let result = await Scholarship.deleteScholarshipType(id);
     return result[0];
 }
 
