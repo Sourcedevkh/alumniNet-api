@@ -35,6 +35,7 @@ const getAllClasses = async () => {
         name: item.class_name,
         description: item.description,
         studentCount: item.student_count || 0, 
+        status: item.status === 1 ? 'Active' : 'Closed',
         metadata: {
             generation: item.generation_name,
             shift: formatShift(item.shift_value),
@@ -58,10 +59,17 @@ const updateClass = async (id, data) => {
     return true;
 }
 
+const archiveClass = async (id) => {
+    let isStatus = await Class.updateStatus(id, 0);
+    if(!isStatus) throw new Error('Could not find class to archive');
+    return true;
+}
+
 module.exports = { 
     findById, 
     createClasses, 
     getClassWithRoster, 
     getAllClasses, 
-    updateClass 
+    updateClass,
+    archiveClass
 };
