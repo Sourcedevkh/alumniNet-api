@@ -6,17 +6,22 @@ const findByName = async (name) => {
 }
 
 const create = async (data) => {
-    let arrs = [data.name, data.description, data.generation_id, data.scholarship_id, data.shift_id];
-    let [results] = await pool.query(
-        'INSERT INTO classes (name, description, generation_id, scholarship_id, shift_id) VALUES (?, ?, ?, ?, ?)',
-        arrs
-    );
+    const params = [
+        data.name,
+        data.description,
+        data.generation_id,
+        data.scholarship_id,
+        data.shift_id
+    ];
+
+    const sql = `INSERT INTO classes (name, description, generation_id, scholarship_id, shift_id) VALUES (?, ?, ?, ?, ?)`;
+    const [results] = await pool.query(sql, params);
     return results.insertId;
 }
 
 const getClassbyId = async (classId) => {
     const classSql = `
-        SELECT c.id, c.name, c.description, c.created_at, 
+        SELECT c.id, c.name, c.description, c.created_at, c.status,
                g.name AS generation_name, 
                s.name AS scholarship_name,
                sh.name AS shift_value
@@ -50,14 +55,17 @@ const getClassbyId = async (classId) => {
     `;
 
     const [students] = await pool.query(studentQuery, [classId]);
+    
     return {
         id: classInfo.id,
         name: classInfo.name,
         description: classInfo.description,
+        status: classInfo.status, 
         metadata: {
             generation: classInfo.generation_name,
             scholarship: classInfo.scholarship_name,
-            shift: classInfo.shift_value
+            shift: classInfo.shift_value,
+            status_text: classInfo.status === 1 ? "Active" : "Closed" 
         },
         total_students: students.length,
         students: students
@@ -75,6 +83,7 @@ const getAllClasses = async () => {
         c.id, 
         c.name AS class_name, 
         c.description,
+        c.status,
         c.created_at,
         g.name AS generation_name,
         sc.name AS scholarship_name,
@@ -90,18 +99,26 @@ const getAllClasses = async () => {
     return rows;
 };
 
-const update = async (id, data) =>{
+const update = async (id, data) => {
     let arrs = [data.name, data.description, data.generation_id, data.scholarship_id, data.shift_id, id];
     const sql = `UPDATE classes SET name = COALESCE(?, name), description = COALESCE(?, description), generation_id = COALESCE(?, generation_id), scholarship_id = COALESCE(?, scholarship_id), shift_id = COALESCE(?, shift_id) WHERE id = ?`;
     const [result] = await pool.query(sql, arrs);
     return result.affectedRows > 0;
 }
 
-module.exports = { 
-    findByName, 
-    create, 
-    getClassbyId, 
-    findById, 
-    getAllClasses, 
-    update 
+// Status: 1 = active, 0 = closed
+const updateStatus = async (id, status) => {
+    let arrs = [status, id];
+    const [result] = await pool.query('UPDATE classes SET status = ? WHERE id = ?', arrs);
+    return result.affectedRows > 0;
+}
+
+module.exports = {
+    findByName,
+    create,
+    getClassbyId,
+    findById,
+    getAllClasses,
+    update,
+    updateStatus
 };

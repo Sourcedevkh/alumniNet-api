@@ -6,9 +6,9 @@ const storage = new CloudinaryStorage({
   cloudinary: cloudinary,
   params: {
     folder: "alumniNet", // folder name in Cloudinary
-    allowed_formats: ["jpg", "jpeg", "png", "webp"],
+    allowed_formats: ["jpg", "jpeg", "png"],
     transformation: [
-      { width: 100, crop: "limit" },// optional: auto resize
+      { width: 500, height: 500, crop: "limit" },// optional: auto resize
       { quality: "auto:eco", fetch_format: "auto" }, // ជួយបង្រួមទំហំ file ឲ្យតូចបំផុតតែរូបភាពនៅច្បាស់
     ], 
   },
