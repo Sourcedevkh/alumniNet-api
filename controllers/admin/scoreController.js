@@ -95,6 +95,22 @@ const getStudentScores = async (req, res) => {
     });
   }
 };
+
+const getSubjectScores = async (req, res) => {
+  try {
+    const result = await scoreService.getSubjectScores(req.params.subject_id);
+    return res.status(200).json({
+      success: true,
+      message: "Subject scores retrieved successfully",
+      data: result,
+    });
+  } catch (error) {
+    return res.status(error.statusCode || 400).json({
+      success: false,
+      message: error.message,
+    });
+  }
+};
 // const getClassScoreForm = async (req, res) => {
 //   try {
 //     const result = await scoreService.getClassScoreForm(
@@ -121,5 +137,6 @@ module.exports = {
   updateScore,
   deleteScore,
   getStudentScores,
+  getSubjectScores,
 //   getClassScoreForm,
 };

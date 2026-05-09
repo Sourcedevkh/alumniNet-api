@@ -90,6 +90,27 @@ WHERE students.id = ?
   return rows;
 };
 
+const getScoresBySubjectId = async (subject_id) => {
+  const [rows] = await pool.query(`
+    SELECT
+      s.id,
+      s.student_id,
+      st.fullname AS student_name,
+      s.subject_id,
+      subj.name AS subject_name,
+      s.score,
+      s.created_at,
+      s.updated_at
+    FROM scores s
+    LEFT JOIN students st ON s.student_id = st.id
+    LEFT JOIN subjects subj ON s.subject_id = subj.id
+    WHERE s.subject_id = ?
+    ORDER BY s.id DESC
+  `, [subject_id]);
+
+  return rows;
+};
+
 // const getClassScoreForm = async (class_id) => {
 //   const [students] = await pool.query(
 //     `
@@ -135,5 +156,6 @@ module.exports = {
   updateScore,
   deleteScore,
   getStudentAllSubjectsWithScores,
+  getScoresBySubjectId,
 //   getClassScoreForm,
 };
