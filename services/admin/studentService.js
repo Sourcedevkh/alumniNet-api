@@ -1,5 +1,6 @@
 const studentModel = require("../../models/admin/student");
 const cloudinary = require("../../config/cloudinary");
+const { getPaginationOptions, getSortOptions, getPaginationMeta } = require('../../utils/queryHelper');
 
 const createStudent = async (req) => {
   let body = await req.validateBody;
@@ -150,9 +151,26 @@ const deleteStudent = async (id) => {
   await studentModel.deleteStudent(id);
 };
 
-const getAllStudents = async () => {
-  const students = await studentModel.getAllStudents();
-  return students;
+const getAllStudents = async (query) => {
+  const { page, limit, sort_col, sort_dir } = query;
+
+  const { currentPage, itemsPerPage, skip } = getPaginationOptions(page, limit);
+
+  const allowedColumns = ['id', 'fullname', 'created_at', 'updated_at']; 
+  
+  const { sortColumn, sortDirection } = getSortOptions(sort_col, sort_dir, allowedColumns, 'id');
+
+  const [students, totalItems] = await Promise.all([
+    studentModel.findStudents(itemsPerPage, skip, sortColumn, sortDirection),
+    studentModel.countStudents()
+  ]);
+
+  const paginationMeta = getPaginationMeta(totalItems, currentPage, itemsPerPage);
+
+  return {
+    items: students,
+    meta: paginationMeta
+  };
 };
 
 const getStudentById = async (id) => {

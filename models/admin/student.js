@@ -88,6 +88,18 @@ const getAllStudents = async () => {
   return students;
 };
 
+const findStudents = async (limit, offset, sortColumn, sortDirection) => {
+  const sql = `SELECT * FROM students ORDER BY ${sortColumn} ${sortDirection} LIMIT ? OFFSET ?`;
+  const [rows] = await pool.query(sql, [limit, offset]);
+  return rows;
+};
+
+const countStudents = async () => {
+  const sql = `SELECT COUNT(*) as total FROM students`;
+  const [rows] = await pool.query(sql);
+  return rows[0].total;
+};
+
 module.exports = {
   checkPhone,
   findById,
@@ -96,5 +108,7 @@ module.exports = {
   insertStudent,
   updateStudentInfo,
   updateStudentProfile,
-  deleteStudent
+  deleteStudent,
+  findStudents,
+  countStudents
 };
