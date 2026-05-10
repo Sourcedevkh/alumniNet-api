@@ -12,10 +12,20 @@ DB_USER="root"
 
 function show_help() {
     echo -e "${BLUE}Available commands:${NC}"
+    echo "Usage: ./scripts/ssh.sh [flag/command]"
+    echo ""
+    echo "Flags:"
+    echo "  -h, --help - Show this help message"
+    echo ""
     echo "  setup    - Install dependencies and create .env"
     echo "  db-reset - Drop and recreate database from schema.sql"
     echo "  clean    - Remove node_modules and logs"
 }
+
+if [[ "$1" == "-h" || "$1" == "--help" ]]; then
+    show_help
+    exit 0
+fi
 
 case "$1" in
     "setup")
