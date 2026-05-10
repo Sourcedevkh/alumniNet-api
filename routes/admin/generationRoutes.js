@@ -7,5 +7,7 @@ const generationController = require("../../controllers/admin/generationControll
 
 router.post("/",validate.validateCreateGeneration,generationController.createGeneration,);
 router.get("/:id",generationController.findGenerationByid);
+router.put("/:id",validate.validateUpdateGeneration,generationController.updateGeneration);
+router.delete("/:id", generationController.deleteGeneration);
 
 module.exports = router;

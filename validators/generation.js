@@ -11,9 +11,6 @@ const createGenerationSchema = Joi.object({
 
   scholarship_id: Joi.number().integer().required(),
 
-  // scholarship_types: Joi.number().integer().required(),
-
-
   intake_month: Joi.number().integer().min(1).required().messages({
     "number.base": "intake_month ត្រូវតែជាលេខ",
     "number.min": "ចំនួនខែយ៉ាងតិចគឺ ១ ខែ",
@@ -33,7 +30,24 @@ const validateCreateGeneration = (req, res, next) => {
   next();
 };
 
+const validateUpdateGeneration = (req, res, next) => {
+  const updateGenerationSchema = createGenerationSchema.fork(
+    ["name", "start_year", "end_year", "scholarship_id", "intake_month"],
+    (schema) => schema.optional(),
+  );
+  const { error } = updateGenerationSchema.validate(req.body);
+
+  if (error) {
+    return res.status(400).json({
+      success: false,
+      message: error.details[0].message,
+    });
+  }
+  next();
+};
+
 module.exports = {
   createGenerationSchema,
+  validateUpdateGeneration,
   validateCreateGeneration,
 };
