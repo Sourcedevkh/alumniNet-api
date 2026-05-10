@@ -9,7 +9,10 @@ const createGenerationSchema = Joi.object({
 
   end_year: Joi.number().integer().required(),
 
-  scholarship_type: Joi.number().integer().required(),
+  scholarship_id: Joi.number().integer().required(),
+
+  // scholarship_types: Joi.number().integer().required(),
+
 
   intake_month: Joi.number().integer().min(1).required().messages({
     "number.base": "intake_month ត្រូវតែជាលេខ",

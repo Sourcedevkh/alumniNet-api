@@ -46,6 +46,8 @@ const findGenerationByid = async (id) => {
     }
 
     return result;
+console.log(result);
+
 };
 
 module.exports = {
