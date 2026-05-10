@@ -4,9 +4,9 @@ const { sendResponse } = require('../../utils/responseHelper');
 const findById = async (req, res) => {
     try {
         const data = await classesService.findById(req.params.id);
-        res.json(data);
+        return sendResponse(res, 200, true, 'Class retrieved successed', data);
     } catch (error) {
-        res.status(404).json({ error: error.message });
+        return sendResponse(res, 404, false, error.message);
     }
 }
 
@@ -67,10 +67,22 @@ const updateClass = async (req, res) => {
     }
 }
 
+const archiveClass = async (req, res) => {
+    try {
+        let {id} = req.params;
+        let {status} = req.validateBody;
+        await classesService.archiveClass(id, status);
+        return sendResponse(res, 200, true, 'Class archived successed');
+    } catch (error) {
+        return sendResponse(res, 400, false, error.message);
+    }
+}
+
 module.exports = { 
     findById, 
     createClasses, 
     getClassbyId, 
     getAll,
-    updateClass
+    updateClass,
+    archiveClass
 };

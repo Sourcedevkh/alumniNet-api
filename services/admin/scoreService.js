@@ -1,33 +1,5 @@
 const scoreModel = require("../../models/admin/scoreModel");
-
-const validateScorescore = (score) => {
-  const errors = [];
-
-  if (!score.student_id) {
-    errors.push("student_id is required");
-  }
-  if (!score.subject_id) {
-    errors.push("subject_id is required");
-  }
-  if (score.score === undefined || score.score === null || score.score === "") {
-    errors.push("score is required");
-  }
-  if (score.score !== undefined && score.score !== null && isNaN(Number(score.score))) {
-    errors.push("score must be a number");
-  }
-
-  if (errors.length > 0) {
-    const error = new Error(errors.join(", "));
-    error.statusCode = 400;
-    throw error;
-  }
-
-  return {
-    student_id: Number(score.student_id),
-    subject_id: Number(score.subject_id),
-    score: Number(score.score),
-  };
-};
+const { createScoreSchema, updateScoreSchema } = require('../../validators/score');
 
 const ensureStudentExists = async (student_id) => {
   const [student] = await scoreModel.checkStudentIdExist(student_id);
@@ -69,11 +41,21 @@ const getScoreById = async (id) => {
 };
 
 const createScore = async (body) => {
-  const validated = validateScorescore(body);
-  await ensureStudentExists(validated.student_id);
-  await ensureSubjectExists(validated.subject_id);
+  const { error, value } = createScoreSchema.validate(body, {
+    abortEarly: false,
+    allowUnknown: true,
+  });
 
-  const rows = await scoreModel.createScore(validated);
+  if (error) {
+    const err = new Error(error.details[0].message);
+    err.statusCode = 400;
+    throw err;
+  }
+
+  await ensureStudentExists(value.student_id);
+  await ensureSubjectExists(value.subject_id);
+
+  const rows = await scoreModel.createScore(value);
   return rows[0] || rows;
 };
 
@@ -86,11 +68,21 @@ const updateScore = async (id, body) => {
     score: body.score !== undefined ? body.score : existing.score,
   };
 
-  const validated = validateScorescore(updatedscore);
-  await ensureStudentExists(validated.student_id);
-  await ensureSubjectExists(validated.subject_id);
+  const { error, value } = updateScoreSchema.validate(updatedscore, {
+    abortEarly: false,
+    allowUnknown: true,
+  });
 
-  const rows = await scoreModel.updateScore(id, validated);
+  if (error) {
+    const err = new Error(error.details[0].message);
+    err.statusCode = 400;
+    throw err;
+  }
+
+  await ensureStudentExists(value.student_id);
+  await ensureSubjectExists(value.subject_id);
+
+  const rows = await scoreModel.updateScore(id, value);
   return rows[0] || rows;
 };
 
@@ -110,15 +102,17 @@ const getStudentScores = async (student_id) => {
   await ensureStudentExists(student_id);
   return await scoreModel.getStudentAllSubjectsWithScores(student_id);
 };
-// const getClassScoreForm = async (class_id) => {
-//   if (!class_id) {
-//     const error = new Error("Class ID is required");
-//     error.statusCode = 400;
-//     throw error;
-//   }
 
-//   return await scoreModel.getClassScoreForm(class_id);
-// };
+const getSubjectScores = async (subject_id) => {
+  if (!subject_id) {
+    const error = new Error("Subject ID is required");
+    error.statusCode = 400;
+    throw error;
+  }
+
+  await ensureSubjectExists(subject_id);
+  return await scoreModel.getScoresBySubjectId(subject_id);
+};
 
 module.exports = {
   getAllScores,
@@ -127,5 +121,6 @@ module.exports = {
   updateScore,
   deleteScore,
   getStudentScores,
+  getSubjectScores,
 //   getClassScoreForm,
 };
