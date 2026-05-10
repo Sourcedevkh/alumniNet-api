@@ -1,41 +1,41 @@
 const { pool } = require("../../config/db");
 
 const createGeneration = async (body) => {
-    const arr = [
-        body.name,
-        body.description,
-        body.start_year,
-        body.end_year,
-        body.scholarship_id,
-        body.intake_month,
-    ];
+  const arr = [
+    body.name,
+    body.description,
+    body.start_year,
+    body.end_year,
+    body.scholarship_id,
+    body.intake_month,
+  ];
 
-    const [result] = await pool.query(
-        `INSERT INTO generations 
+  const [result] = await pool.query(
+    `INSERT INTO generations
         (name, description, start_year, end_year, scholarship_id, intake_month) 
         VALUES (?, ?, ?, ?, ?, ?)`,
-        arr
-    );
+    arr,
+  );
 
-    // 👉 JOIN here
-    const [rows] = await pool.query(
-        `SELECT 
-            g.*, 
+
+  const [rows] = await pool.query(
+    `SELECT 
+            g.*,
             s.name AS scholarship_name,
             st.name AS scholarship_type
         FROM generations g
         LEFT JOIN scholarships s ON g.scholarship_id = s.id
         LEFT JOIN scholarship_types st ON s.type_id = st.id
         WHERE g.id = ?`,
-        [result.insertId]
-    );
+    [result.insertId],
+  );
 
-    return rows[0];
+  return rows[0];
 };
 
 const findGenerationByid = async (id) => {
-   const [rows] = await pool.query(
-        `SELECT 
+  const [rows] = await pool.query(
+    `SELECT 
             g.*, 
             s.name AS scholarship_name,
             st.name AS scholarship_type
@@ -43,13 +43,55 @@ const findGenerationByid = async (id) => {
         LEFT JOIN scholarships s ON g.scholarship_id = s.id
         LEFT JOIN scholarship_types st ON s.type_id = st.id
         WHERE g.id = ?`,
-        [id]
-    );
+    [id],
+  );
 
-    return rows[0];
+  return rows[0];
+};
+
+const updateGeneration = async (id, body) => {
+  const arr = [
+    body.name,
+    body.description,
+    body.start_year,
+    body.end_year,
+    body.scholarship_id,
+    body.intake_month,
+    id,
+  ];
+  const [result] = await pool.query(
+    `UPDATE generations
+        SET name = ?, description = ?, start_year = ?, end_year = ?, scholarship_id = ?, intake_month = ? 
+        WHERE id = ?`,
+    arr,
+  );
+  const [rows] = await pool.query(
+    `SELECT
+            g.*,
+            s.name AS scholarship_name,
+            st.name AS scholarship_type
+        FROM generations g
+        LEFT JOIN scholarships s ON g.scholarship_id = s.id
+        LEFT JOIN scholarship_types st ON s.type_id = st.id
+        WHERE g.id = ?`,
+    [id],
+  );
+
+  return rows[0];
+};
+
+
+
+const deleteGeneration = async (id) => {
+  const [result] = await pool.query(`DELETE FROM generations WHERE id = ?`, [
+    id,
+  ]);
+  return result;
 };
 
 module.exports = {
-    createGeneration,
-    findGenerationByid,
+  createGeneration,
+  findGenerationByid,
+  updateGeneration,
+  deleteGeneration,
 };
