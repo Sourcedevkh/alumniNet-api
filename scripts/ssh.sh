@@ -1,14 +1,6 @@
 #!/bin/bash
 
-# Set color
-GREEN='\033[0;32m'
-BLUE='\033[0;34m'
-RED='\033[0;31m'
-NC='\033[0m' # No Color
-
-# Config
-DB_NAME="AlumniNet"
-DB_USER="root"
+source ./scripts/constants.sh
 
 function show_help() {
     echo -e "${BLUE}Available commands:${NC}"
