@@ -69,6 +69,17 @@ const getStudentById = async (req, res) => {
   }
 };
 
+const addStudentToClass = async (req, res) => {
+  try {
+    const result = await studentService.addStudentToClass(req.body);
+    return sendResponse(res, 200, true, "Student added successfully", result);
+  } catch (error) {
+    console.log(error);
+    
+    return sendResponse(res, error.statusCode || 500, false, error.message, null, error.data);
+  }
+};
+
 module.exports = {
   createStudent,
   updateStudentInfo,
@@ -76,4 +87,5 @@ module.exports = {
   deleteStudent,
   getAllStudents,
   getStudentById,
+  addStudentToClass,
 };
