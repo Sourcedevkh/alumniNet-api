@@ -1,4 +1,4 @@
-const express = require('express');
+﻿const express = require('express');
 const dotenv = require('dotenv');
 dotenv.config();
 
@@ -14,9 +14,11 @@ const authRoute = require('./routes/super-admin/userRoute');
 // Admin
 const authAdminRoute = require('./routes/admin/userRoutes');
 const scholarshipRoute = require('./routes/admin/scholarshipRoutes');
+const subjectRoute = require('./routes/admin/subjectRoute');
 const profileRoute = require('./routes/admin/profileRoutes');
 const generationRoute = require('./routes/admin/generationRoutes');
 const studentRoute = require('./routes/admin/studentRoutes');
+const classRoute = require('./routes/admin/classesRoute');
 const scoreRoute = require('./routes/admin/scoreRoute');
 
 
@@ -27,6 +29,10 @@ app.use('/api/admin/profile', profileRoute);
 app.use('/api/admin/score', scoreRoute);
 app.use('/api/scholarship', scholarshipRoute);
 app.use('/api/generations', generationRoute);
+app.use('/api/admin/subjects', subjectRoute);
+app.use('/api/generation', generationRoute);
+app.use('/api/admin/class', classRoute);
+
 
 app.listen(PORT, () => {
     console.log(`Service running on port ${PORT}`);

@@ -1,10 +1,11 @@
+/**    Make by SiNeth    **/
 const express = require("express");
 const router = express.Router();
 
 const { isLogin } = require("../../middlewares/auth");
+const { createStudent } = require("../../validators/user");
 const handleProfileUpload = require("../../middlewares/handleProfileUpload");
 const validate = require("../../middlewares/validate");
-const { createStudent } = require("../../validators/user");
 const studentController = require("../../controllers/admin/studentController");
 
 router.post(
@@ -27,8 +28,8 @@ router.post(
 );
 
 router.delete("/delete/:id", studentController.deleteStudent);
-
 router.get("/all", studentController.getAllStudents);
 router.get("/id/:id", studentController.getStudentById);
+router.post("/add", studentController.addStudentToClass);
 
 module.exports = router;

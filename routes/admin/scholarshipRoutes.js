@@ -2,23 +2,32 @@ const express = require('express');
 const router = express.Router();
 
 const scholarshipController = require('../../controllers/admin/scholarController');
+const validate = require('../../middlewares/validate');
+const { scholarshipTypeSchema, scholarshipSubjectSchema,scholarshipTrackSchema} = require('../../validators/scholarship');
 
 // Scholarship Type routes
-router.post('/scholarship-types', scholarshipController.createScholarshipType);
-router.get('/scholarship-types', scholarshipController.getScholarshipTypes);
-router.put('/scholarship-types/:id', scholarshipController.updateScholarshipType);
-router.delete('/scholarship-types/:id', scholarshipController.deleteScholarshipType);
+router.post('/types', validate(scholarshipTypeSchema), scholarshipController.createScholarshipType);
+router.get('/types', scholarshipController.getScholarshipTypes);
+router.put('/types/:id',validate(scholarshipTypeSchema), scholarshipController.updateScholarshipType);
+router.delete('/types/:id', scholarshipController.deleteScholarshipType);
 
 //Scholarship subject routes
-router.post('/scholarship-subjects', scholarshipController.createScholarshipSubject);
-router.get('/scholarship-subjects', scholarshipController.getAllScholarshipSubjects);
-router.put('/scholarship-subjects/:id', scholarshipController.updateScholarshipSubject);
-router.delete('/scholarship-subjects/:id', scholarshipController.deleteScholarshipSubject);
+router.post('/subjects',validate(scholarshipSubjectSchema), scholarshipController.createScholarshipSubject);
+router.get('/subjects', scholarshipController.getAllScholarshipSubjects);
+router.put('/subjects/:id', validate(scholarshipSubjectSchema), scholarshipController.updateScholarshipSubject);
+router.delete('/subjects/:id', scholarshipController.deleteScholarshipSubject);
 
 // Scholarship Track routes
-router.post('/scholarship-tracks', scholarshipController.createScholarshipTrack);
-router.get('/scholarship-tracks', scholarshipController.getAllScholarshipTracks);
-router.put('/scholarship-tracks/:id', scholarshipController.updateScholarshipTrack);
-router.delete('/scholarship-tracks/:id', scholarshipController.deleteScholarshipTrack);
+router.post('/tracks', validate(scholarshipTrackSchema), scholarshipController.createScholarshipTrack);
+router.get('/tracks', scholarshipController.getAllScholarshipTracks);
+router.put('/tracks/:id', validate(scholarshipTrackSchema), scholarshipController.updateScholarshipTrack);
+router.delete('/tracks/:id', scholarshipController.deleteScholarshipTrack);
+
+// Scholarship routes
+router.post('/scholarships', scholarshipController.createScholarship);
+router.get('/scholarships', scholarshipController.getAllScholarships);
+router.get('/scholarships/:id', scholarshipController.getScholarship);
+router.put('/scholarships/:id', scholarshipController.updateScholarship);
+router.delete('/scholarships/:id', scholarshipController.deleteScholarship);
 
 module.exports = router;

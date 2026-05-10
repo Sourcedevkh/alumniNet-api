@@ -1,5 +1,6 @@
 const studentModel = require("../../models/admin/student");
 const cloudinary = require("../../config/cloudinary");
+const { getPaginationOptions, getSortOptions, getPaginationMeta } = require('../../utils/queryHelper');
 
 const createStudent = async (req) => {
   let body = await req.validateBody;
@@ -150,9 +151,55 @@ const deleteStudent = async (id) => {
   await studentModel.deleteStudent(id);
 };
 
-const getAllStudents = async () => {
-  const students = await studentModel.getAllStudents();
-  return students;
+const getAllStudents = async (query) => {
+  const { page, limit, sort_col, sort_dir } = query;
+
+  const { currentPage, itemsPerPage, skip } = getPaginationOptions(page, limit);
+
+  const allowedColumns = ['id', 'fullname', 'created_at', 'updated_at']; 
+  
+  const { sortColumn, sortDirection } = getSortOptions(sort_col, sort_dir, allowedColumns, 'id');
+
+  const [students, totalItems] = await Promise.all([
+    studentModel.findStudents(itemsPerPage, skip, sortColumn, sortDirection),
+    studentModel.countStudents()
+  ]);
+
+  const paginationMeta = getPaginationMeta(totalItems, currentPage, itemsPerPage);
+
+  return {
+    items: students.map(student => ({
+      id: student.student_id,
+      fullname: student.fullname,
+      profile_url: student.profile_url,
+      gender: student.gender,
+      phone: student.phone,
+      status: student.status,
+      generation: {
+        id: student.generation_id,
+        name: student.generation_name,
+        description: student.generation_desc,
+      },
+      scholarship: {
+        id: student.scholarship_id,
+        name: student.scholarship_name,
+        description: student.scholarship_desc,
+      },
+      shift: {
+        id: student.shift_id,
+        name: student.shift_name,
+      },
+      class: {
+        id: student.class_id,
+        name: student.class_name,
+        description: student.class_desc,
+      },
+      
+      created_at: student.created_at,
+      updated_at: student.updated_at,
+    })),
+    meta: paginationMeta
+  };
 };
 
 const getStudentById = async (id) => {
@@ -166,7 +213,94 @@ const getStudentById = async (id) => {
     throw error;
   }
 
-  return existingStudent[0];
+  const student = await studentModel.getFullInfoById(id);
+  
+  return {
+    id: student.student_id,
+    fullname: student.fullname,
+    profile_url: student.profile_url,
+    gender: student.gender,
+    phone: student.phone,
+    status: student.status,
+    generation: {
+      id: student.generation_id,
+      name: student.generation_name,
+      description: student.generation_desc,
+    },
+    scholarship: {
+      id: student.scholarship_id,
+      name: student.scholarship_name,
+      description: student.scholarship_desc,
+    },
+    shift: {
+      id: student.shift_id,
+      name: student.shift_name,
+    },
+    class: {
+      id: student.class_id,
+      name: student.class_name,
+      description: student.class_desc,
+    },
+    created_at: student.created_at,
+    updated_at: student.updated_at,
+  };
+};
+
+const addStudentToClass = async (body) => {
+  const { student_id, class_id } = body;
+
+  const [studentData, classData] = await Promise.all([
+    studentModel.findById(student_id, "students"),
+    studentModel.findById(class_id, "classes"),
+  ]);
+
+  if (!studentData) {
+    const error = new Error("Student record does not exist.");
+    error.statusCode = 404;
+    error.data = {
+      message: "Student not found.",
+    };
+    throw error;
+  }
+
+  if (!classData) {
+    const error = new Error("Class record does not exist.");
+    error.statusCode = 404;
+    error.data = {
+      message: "Class not found.",
+    };
+    throw error;
+  }
+
+  const existingEntry = await studentModel.findStudentInClass(student_id, class_id);
+  if (existingEntry) {
+    const error = new Error("Duplicate entry for key 'class_students.unique_student_class'");
+    error.statusCode = 409;
+    error.data = {
+      message: "Student is already in this class.",
+    };
+    throw error;
+  }
+
+  const insertId = await studentModel.addStudentToClass(studentData.id, classData.id);
+  const result = await studentModel.getInfoStudentIntoClass(insertId);
+
+  return {
+    id: insertId,
+    student:{
+      id: result[0].student_id,
+      fullname: result[0].fullname,
+      profile_url: result[0].profile_url,
+      phone: result[0].phone,
+      gender: result[0].gender,
+    },
+    class: {
+      id: result[0].class_id,
+      name: result[0].name,
+      description: result[0].description,
+    },
+    createt_at: result[0].created_at,
+  };
 };
 
 module.exports = {
@@ -176,4 +310,5 @@ module.exports = {
   deleteStudent,
   getAllStudents,
   getStudentById,
+  addStudentToClass,
 };

@@ -52,7 +52,7 @@ const deleteStudent = async (req, res) => {
 
 const getAllStudents = async (req, res) => {
   try {
-    const result = await studentService.getAllStudents();
+    const result = await studentService.getAllStudents(req.query);
     return sendResponse(res, 200, true, "Get all students succeeded", result);
   } catch (error) {
     return sendResponse(res, error.statusCode || 500, false, error.message, null, error.data);
@@ -69,6 +69,17 @@ const getStudentById = async (req, res) => {
   }
 };
 
+const addStudentToClass = async (req, res) => {
+  try {
+    const result = await studentService.addStudentToClass(req.body);
+    return sendResponse(res, 200, true, "Student added successfully", result);
+  } catch (error) {
+    console.log(error);
+    
+    return sendResponse(res, error.statusCode || 500, false, error.message, null, error.data);
+  }
+};
+
 module.exports = {
   createStudent,
   updateStudentInfo,
@@ -76,4 +87,5 @@ module.exports = {
   deleteStudent,
   getAllStudents,
   getStudentById,
+  addStudentToClass,
 };
