@@ -172,7 +172,154 @@ const deleteScholarshipTrack = async (id) => {
     return rows;
 }
 
+const getScholarshipById = async (id) => {
+    const [rows] = await pool.query(
+        `SELECT
+            s.id,
+            s.name,
+            s.description,
+            s.type_id,
+            st.name AS type_name,
+            s.subtype_id,
+            ss.name AS subtype_name,
+            s.track_id,
+            stt.name AS track_name,
+            s.created_at,
+            s.updated_at
+        FROM scholarships s
+        LEFT JOIN scholarship_types st ON s.type_id = st.id
+        LEFT JOIN scholarship_subtypes ss ON s.subtype_id = ss.id
+        LEFT JOIN scholarship_tracks stt ON s.track_id = stt.id
+        WHERE s.id = ?`,
+        [id]
+    );
 
+    return rows;
+}
+
+const getAllScholarships = async () => {
+    const [rows] = await pool.query(
+        `SELECT
+            s.id,
+            s.name,
+            s.description,
+            s.type_id,
+            st.name AS type_name,
+            s.subtype_id,
+            ss.name AS subtype_name,
+            s.track_id,
+            stt.name AS track_name,
+            s.created_at,
+            s.updated_at
+        FROM scholarships s
+        LEFT JOIN scholarship_types st ON s.type_id = st.id
+        LEFT JOIN scholarship_subtypes ss ON s.subtype_id = ss.id
+        LEFT JOIN scholarship_tracks stt ON s.track_id = stt.id
+        ORDER BY s.id DESC`
+    );
+
+    return rows;
+}
+
+const getScholarshipSubjects = async (scholarship_id) => {
+    const [rows] = await pool.query(
+        `SELECT subj.id AS subject_id, subj.name AS subject_name
+         FROM scholarship_subjects ss
+         JOIN subjects subj ON ss.subject_id = subj.id
+         WHERE ss.scholarship_id = ?`,
+        [scholarship_id]
+    );
+
+    return rows;
+}
+
+const getScholarshipSubjectsBatch = async (scholarshipIds) => {
+    if (!Array.isArray(scholarshipIds) || scholarshipIds.length === 0) {
+        return [];
+    }
+
+    const placeholders = scholarshipIds.map(() => '?').join(',');
+    const [rows] = await pool.query(
+        `SELECT ss.scholarship_id, subj.id AS subject_id, subj.name AS subject_name
+         FROM scholarship_subjects ss
+         JOIN subjects subj ON ss.subject_id = subj.id
+         WHERE ss.scholarship_id IN (${placeholders})`,
+        scholarshipIds
+    );
+
+    return rows;
+}
+
+const checkScholarshipTrackIdExist = async (track_id) => {
+    const [rows] = await pool.query('SELECT id FROM scholarship_tracks WHERE id = ?', [track_id]);
+    return rows;
+}
+
+const createScholarship = async (body) => {
+    const [result] = await pool.query(
+        'INSERT INTO scholarships (name, description, type_id, subtype_id, track_id) VALUES (?, ?, ?, ?, ?)',
+        [body.name, body.description || null, body.type_id || null, body.subtype_id || null, body.track_id || null]
+    );
+
+    return result.insertId;
+}
+
+const updateScholarship = async (id, body) => {
+    const arrs = [
+        body.name || null,
+        body.description || null,
+        body.type_id || null,
+        body.subtype_id || null,
+        body.track_id || null,
+        id,
+    ];
+
+    const [result] = await pool.query(
+        `UPDATE scholarships
+         SET name = COALESCE(?, name),
+             description = COALESCE(?, description),
+             type_id = COALESCE(?, type_id),
+             subtype_id = COALESCE(?, subtype_id),
+             track_id = COALESCE(?, track_id)
+         WHERE id = ?`,
+        arrs
+    );
+
+    return result.affectedRows > 0;
+}
+
+const deleteScholarship = async (id) => {
+    const [rows] = await pool.query('DELETE FROM scholarships WHERE id = ?', [id]);
+    return rows;
+}
+
+const deleteScholarshipSubjects = async (scholarship_id) => {
+    await pool.query('DELETE FROM scholarship_subjects WHERE scholarship_id = ?', [scholarship_id]);
+}
+
+const addScholarshipSubjects = async (scholarship_id, subjectIds) => {
+    if (!Array.isArray(subjectIds) || subjectIds.length === 0) {
+        return;
+    }
+
+    const values = subjectIds.map((subject_id) => [scholarship_id, subject_id]);
+    await pool.query('INSERT INTO scholarship_subjects (scholarship_id, subject_id) VALUES ?', [values]);
+}
+
+const checkScholarshipIdExist = async (id) => {
+    const [rows] = await pool.query('SELECT id FROM scholarships WHERE id = ?', [id]);
+    return rows;
+}
+
+const checkSubjectIdsExist = async (subjectIds) => {
+    if (!Array.isArray(subjectIds) || subjectIds.length === 0) {
+        return [];
+    }
+
+    const placeholders = subjectIds.map(() => '?').join(',');
+    const [rows] = await pool.query(`SELECT id FROM subjects WHERE id IN (${placeholders})`, subjectIds);
+    return rows.map((row) => row.id);
+}
 
 module.exports = {
     findScholarshipTypeByName,
@@ -193,5 +340,17 @@ module.exports = {
     checkScholarshipTypeIdExist,
     updateScholarshipTrack,
     deleteScholarshipTrack,
-    findScholarshipSubjectByName
+    findScholarshipSubjectByName,
+    getScholarshipById,
+    getAllScholarships,
+    getScholarshipSubjects,
+    createScholarship,
+    updateScholarship,
+    deleteScholarship,
+    deleteScholarshipSubjects,
+    addScholarshipSubjects,
+    checkScholarshipIdExist,
+    checkSubjectIdsExist,
+    getScholarshipSubjectsBatch,
+    checkScholarshipTrackIdExist
 }
