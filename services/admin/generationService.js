@@ -38,6 +38,19 @@ const createGeneration = async (body) => {
     return result;
 };
 
+const findGenerationByid = async (id) => {
+    const result = await generationModel.findGenerationByid(id);
+
+    if (!result) {
+        throw new Error("Generation not found");
+    }
+
+    return result;
+console.log(result);
+
+};
+
 module.exports = {
     createGeneration,
+    findGenerationByid,
 };
