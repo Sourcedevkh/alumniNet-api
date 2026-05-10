@@ -11,6 +11,9 @@ const createGenerationSchema = Joi.object({
 
   scholarship_id: Joi.number().integer().required(),
 
+  // scholarship_types: Joi.number().integer().required(),
+
+
   intake_month: Joi.number().integer().min(1).required().messages({
     "number.base": "intake_month ត្រូវតែជាលេខ",
     "number.min": "ចំនួនខែយ៉ាងតិចគឺ ១ ខែ",

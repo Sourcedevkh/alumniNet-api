@@ -5,6 +5,7 @@ const validate = require("../../validators/generation");
 
 const generationController = require("../../controllers/admin/generationController");
 
-router.post("/create",validate.validateCreateGeneration,generationController.createGeneration,);
+router.post("/",validate.validateCreateGeneration,generationController.createGeneration,);
+router.get("/:id",generationController.findGenerationByid);
 
 module.exports = router;
