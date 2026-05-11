@@ -3,7 +3,13 @@ const router = express.Router();
 
 const scholarshipController = require('../../controllers/admin/scholarController');
 const validate = require('../../middlewares/validate');
-const { scholarshipTypeSchema, scholarshipSubjectSchema,scholarshipTrackSchema} = require('../../validators/scholarship');
+const {
+  scholarshipTypeSchema,
+  scholarshipSubjectSchema,
+  scholarshipTrackSchema,
+  scholarshipCreateSchema,
+  scholarshipUpdateSchema,
+} = require('../../validators/scholarship');
 
 // Scholarship Type routes
 router.post('/types', validate(scholarshipTypeSchema), scholarshipController.createScholarshipType);
@@ -24,10 +30,10 @@ router.put('/tracks/:id', validate(scholarshipTrackSchema), scholarshipControlle
 router.delete('/tracks/:id', scholarshipController.deleteScholarshipTrack);
 
 // Scholarship routes
-router.post('/scholarships', scholarshipController.createScholarship);
+router.post('/scholarships', validate(scholarshipCreateSchema), scholarshipController.createScholarship);
 router.get('/scholarships', scholarshipController.getAllScholarships);
 router.get('/scholarships/:id', scholarshipController.getScholarship);
-router.put('/scholarships/:id', scholarshipController.updateScholarship);
+router.put('/scholarships/:id', validate(scholarshipUpdateSchema), scholarshipController.updateScholarship);
 router.delete('/scholarships/:id', scholarshipController.deleteScholarship);
 
 module.exports = router;
