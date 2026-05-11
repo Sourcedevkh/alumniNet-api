@@ -15,6 +15,21 @@ const createScoreSchema = Joi.object({
   }),
 });
 
+const updateScoreSchema = Joi.object({
+  student_id: Joi.number().integer().optional().messages({
+    "number.base": "student_id must be a number",
+    "number.integer": "student_id must be an integer",
+  }),
+  subject_id: Joi.number().integer().optional().messages({
+    "number.base": "subject_id must be a number",
+    "number.integer": "subject_id must be an integer",
+  }),
+  score: Joi.number().optional().messages({
+    "number.base": "score must be a number",
+  }),
+}).or('student_id', 'subject_id', 'score');
+
 module.exports = {
   createScoreSchema,
+  updateScoreSchema,
 };
