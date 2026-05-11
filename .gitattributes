@@ -1,0 +1,3 @@
+scripts/*.sh linguist-detectable=true
+scripts/ssh.sh linguist-language=Shell
+database/schema.sql linguist-detectable=true

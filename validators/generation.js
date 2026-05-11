@@ -30,7 +30,24 @@ const validateCreateGeneration = (req, res, next) => {
   next();
 };
 
+const validateUpdateGeneration = (req, res, next) => {
+  const updateGenerationSchema = createGenerationSchema.fork(
+    ["name", "start_year", "end_year", "scholarship_id", "intake_month"],
+    (schema) => schema.optional(),
+  );
+  const { error } = updateGenerationSchema.validate(req.body);
+
+  if (error) {
+    return res.status(400).json({
+      success: false,
+      message: error.details[0].message,
+    });
+  }
+  next();
+};
+
 module.exports = {
   createGenerationSchema,
+  validateUpdateGeneration,
   validateCreateGeneration,
 };

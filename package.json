@@ -5,7 +5,10 @@
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "nodemon app.js"
+    "start": "nodemon app.js",
+    "db:reset": "mysql -u root -p -e \"DROP DATABASE IF EXISTS AlumniNet; CREATE DATABASE AlumniNet;\" && mysql -u root -p AlumniNet < ./database/schema.sql",
+    "sync": "git checkout dev && git pull origin dev && npm install && npm run db:reset",
+    "migrate": "mysql -u root -p AlumniNet < ./database/migration.sql"
   },
   "repository": {
     "type": "git",
@@ -13,7 +16,7 @@
   },
   "keywords": [],
   "author": "",
-  "license": "ISC",
+  "license": "Apache2.0",
   "bugs": {
     "url": "https://github.com/Sourcedevkh/AlumniNet-Backend/issues"
   },

@@ -1,5 +1,9 @@
 const { pool } = require('../../config/db');
 const Scholarship = require('../../models/admin/scholarship');
+const {
+    scholarshipCreateSchema,
+    scholarshipUpdateSchema,
+} = require('../../validators/scholarship');
 
 const getScholarships = async () => {
     let rows = await Scholarship.getScholar_types();
@@ -59,6 +63,8 @@ const deleteScholarshipType = async (id) => {
 
 const createScholarshipSubject = async (body) => {
     let { name, type_id } = body;
+    
+
     if (!name || !type_id) {
         throw new Error('Name and type_id are required');
     }
@@ -72,6 +78,12 @@ const createScholarshipSubject = async (body) => {
     if (existing.length > 0) {
         throw new Error('Scholarship subject name already exists');
     }
+
+    const existingScholarship = await Scholarship.findScholarshipByName(name);
+    if (existingScholarship.length > 0) {
+        throw new Error('Scholarship name already exists');
+    }
+
 
     let type = await Scholarship.checkTypeIdExist(type_id);
     if (type.length === 0) {
@@ -214,13 +226,21 @@ const getScholarshipDetails = async (id) => {
 };
 
 const createScholarshipWithSubjects = async (body) => {
-    if (!body.name) {
-        throw new Error('Name is required');
+    const { error, value } = scholarshipCreateSchema.validate(body, {
+        abortEarly: false,
+        stripUnknown: true
+    });
+
+    if (error) {
+        throw new Error(error.details[0].message);
     }
 
+    body = value;
     const name = body.name.trim();
-    if (name === '') {
-        throw new Error('Name cannot be empty');
+
+    const existing = await Scholarship.findScholarshipByName(name);
+    if (existing.length > 0) {
+        throw new Error('Scholarship name already exists');
     }
 
     if (body.type_id) {
@@ -268,6 +288,16 @@ const createScholarshipWithSubjects = async (body) => {
 };
 
 const updateScholarshipWithSubjects = async (id, body) => {
+    const { error, value } = scholarshipUpdateSchema.validate(body, {
+        abortEarly: false,
+        stripUnknown: true
+    });
+
+    if (error) {
+        throw new Error(error.details[0].message);
+    }
+
+    body = value;
     const scholarshipExists = await Scholarship.checkScholarshipIdExist(id);
     if (scholarshipExists.length === 0) {
         throw new Error('Scholarship ID not found');
@@ -275,6 +305,13 @@ const updateScholarshipWithSubjects = async (id, body) => {
 
     if (body.name !== undefined && String(body.name).trim() === '') {
         throw new Error('Name cannot be empty');
+    }
+
+    if (body.name !== undefined) {
+        const existing = await Scholarship.findScholarshipByName(body.name.trim());
+        if (existing.length > 0 && existing[0].id !== parseInt(id)) {
+            throw new Error('Scholarship name already exists');
+        }
     }
 
     if (body.type_id !== undefined) {
