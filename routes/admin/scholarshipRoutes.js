@@ -4,6 +4,7 @@ const router = express.Router();
 const { isLogin } = require('../../middlewares/auth');
 const scholarshipController = require('../../controllers/admin/scholarController');
 const validate = require('../../middlewares/validate');
+
 const {
   scholarshipTypeSchema,
   scholarshipSubjectSchema,
