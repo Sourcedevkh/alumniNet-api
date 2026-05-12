@@ -27,14 +27,14 @@ router.delete('/subjects/:id', isLogin, validate(scholarshipSubjectSchema), scho
 // Scholarship Track routes
 router.post('/tracks', isLogin, validate(scholarshipTrackSchema), scholarshipController.createScholarshipTrack);
 router.get('/tracks', isLogin, scholarshipController.getAllScholarshipTracks);
-router.put('/tracks/:id', validate(scholarshipTrackSchema), scholarshipController.updateScholarshipTrack);
-router.delete('/tracks/:id', scholarshipController.deleteScholarshipTrack);
+router.put('/tracks/:id', isLogin, validate(scholarshipTrackSchema), scholarshipController.updateScholarshipTrack);
+router.delete('/tracks/:id', isLogin, validate(scholarshipTrackSchema), scholarshipController.deleteScholarshipTrack);
 
 // Scholarship routes
-router.post('/scholarships', validate(scholarshipCreateSchema), scholarshipController.createScholarship);
-router.get('/scholarships', scholarshipController.getAllScholarships);
-router.get('/scholarships/:id', scholarshipController.getScholarship);
-router.put('/scholarships/:id', validate(scholarshipUpdateSchema), scholarshipController.updateScholarship);
-router.delete('/scholarships/:id', scholarshipController.deleteScholarship);
+router.post('/scholarships', isLogin, validate(scholarshipCreateSchema), scholarshipController.createScholarship);
+router.get('/scholarships', isLogin, scholarshipController.getAllScholarships);
+router.get('/scholarships/:id', isLogin, scholarshipController.getScholarship);
+router.put('/scholarships/:id', isLogin, validate(scholarshipUpdateSchema), scholarshipController.updateScholarship);
+router.delete('/scholarships/:id', isLogin, validate(scholarshipUpdateSchema), scholarshipController.deleteScholarship);
 
 module.exports = router;
