@@ -11,12 +11,6 @@ const getAllGeneration = async () => {
 const createGeneration = async (body) => {
     let { name, start_year, end_year, intake_month } = body;
 
-    if (Number(body.start_year) > Number(body.end_year)) {
-        const error = new Error("ឆ្នាំចាប់ផ្តើមមិនអាចធំជាងឆ្នាំបញ្ចប់ទេ!");
-        error.status = 400;
-        throw error;
-    }
-
     const isDuplicate = await generationModel.checkDuplicateName(name);
     if (isDuplicate) {
         const error = new Error("Generation name already exists!");
@@ -24,6 +18,13 @@ const createGeneration = async (body) => {
         throw error;
     }
 
+    if (Number(body.start_year) > Number(body.end_year)) {
+        const error = new Error("Start year must be less than or equal to end year");
+        error.status = 400;
+        throw error;
+    }
+
+    
     if (intake_month !== undefined) {
         const totalMonths = parseInt(intake_month);
         const years = Math.floor(totalMonths / 12);
