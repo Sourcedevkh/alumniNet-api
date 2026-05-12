@@ -10,6 +10,7 @@ const studentController = require("../../controllers/admin/studentController");
 
 router.post(
   "/create",
+  isLogin,
   handleProfileUpload,
   validate(createStudent),
   studentController.createStudent,
@@ -17,24 +18,26 @@ router.post(
 
 router.put(
   "/update-profile/:id",
+  isLogin,
   handleProfileUpload,
   studentController.updateStudentProfile,
 );
 
 router.put(
   "/update-info/:id",
+  isLogin,
   validate(createStudent),
   studentController.updateStudentInfo,
 );
 
-router.delete("/delete/:id", studentController.deleteStudent);
-router.get("/all", studentController.getAllStudents);
-router.get("/id/:id", studentController.getStudentById);
+router.delete("/delete/:id", isLogin, studentController.deleteStudent);
+router.get("/all", isLogin, studentController.getAllStudents);
+router.get("/id/:id", isLogin, studentController.getStudentById);
 
 // Add student to class
-router.post("/add-class", studentController.addStudentToClass);
-router.delete("/remove/classes/:class_id/students/:student_id", studentController.removeStudentFromClass);
-router.get("/by-class/:class_id", studentController.getStudentsByClassId);
-router.get("/by-student/:student_id", studentController.getClassesByStudentId);
+router.post("/add-class", isLogin, studentController.addStudentToClass);
+router.delete("/remove/classes/:class_id/students/:student_id", isLogin, studentController.removeStudentFromClass);
+router.get("/by-class/:class_id", isLogin, studentController.getStudentsByClassId);
+router.get("/by-student/:student_id", isLogin, studentController.getClassesByStudentId);
 
 module.exports = router;

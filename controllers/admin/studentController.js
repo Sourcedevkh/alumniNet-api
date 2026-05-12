@@ -3,8 +3,9 @@ const studentService = require("../../services/admin/studentService");
 
 const createStudent = async (req, res) => {
   try {
-    const result = await studentService.createStudent(req);
-
+    let body = await req.validateBody;
+    const result = await studentService.createStudent(body, req.file);
+    
     return sendResponse(res, 200, true, "Create student succeeded", result);
   } catch (error) {
     
