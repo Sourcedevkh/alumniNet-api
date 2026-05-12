@@ -10,12 +10,10 @@ const {
   responeDataAddStudentToClass,
 } = require("../../utils/studentResTemplate");
 
-const createStudent = async (req) => {
-  let body = await req.validateBody;
+const createStudent = async (body, file) => {
   let imageUrl = null;
   let cloudinaryId = null;
   const { phone, generation_id, scholarship_id, shift_id } = body;
-  const file = req.file;
 
   if (file) {
     imageUrl = file.path;
