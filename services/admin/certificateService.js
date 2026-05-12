@@ -3,9 +3,7 @@ const certificate = require('../../models/admin/certificate');
 
 
 const createCertificate = async (body) => {
-    if(!body.student_id){
-        throw new Error('Student ID is required');
-    }
+
     let existing = await certificate.checkIdExists(body.student_id);
     if(existing.length > 0){
         throw new Error('Certificate for this student already exists');
@@ -22,9 +20,6 @@ const getAllCertificates = async () => {
 };
 
 const deleteCertificate = async (id) => {
-    if(!id) {
-        throw new Error('Certificate ID is required');
-    }
 
     let existing = await certificate.getCertificateById(id);
     if(!existing) {
@@ -36,10 +31,7 @@ const deleteCertificate = async (id) => {
 }
 
 const getCertificateById = async (id) => {
-    if(!id) {
-        throw new Error('Certificate ID is required');
-    }
-
+    
     let result = await certificate.getCertificateById(id);
     if(!result) {
         throw new Error('Certificate not found');
