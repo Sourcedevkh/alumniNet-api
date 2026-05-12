@@ -13,9 +13,6 @@ const getScholarships = async () => {
 
 const createScholarshipType = async (body) => {
 
-    if (!body.name) {
-        throw new Error('Name is required');
-    }
     let name = body.name.trim();
     let existing = await Scholarship.findScholarshipTypeByName(name);
     if (existing.length > 0) {
@@ -28,9 +25,6 @@ const createScholarshipType = async (body) => {
 
 
 const updateScholarshipType = async (id, body) => {
-    if (!body.name) {
-        throw new Error ('Name is required');
-    }
     if (body.name.trim() === '') {
         throw new Error('Name Scholarship not found');
     }
@@ -48,10 +42,6 @@ const updateScholarshipType = async (id, body) => {
 }
 
 const deleteScholarshipType = async (id) => {
-    if (!id) {
-        throw new Error('Scholarship type ID is required');
-    }
-
     let checkId = await Scholarship.getScholarshipTypeById(id);
     if (checkId.length === 0) {
         throw new Error('Scholarship type ID not found');
@@ -63,12 +53,6 @@ const deleteScholarshipType = async (id) => {
 
 const createScholarshipSubject = async (body) => {
     let { name, type_id } = body;
-    
-
-    if (!name || !type_id) {
-        throw new Error('Name and type_id are required');
-    }
-
      name = name.trim();
     if (name === '') {
         throw new Error('Scholarship subject name cannot be empty');
@@ -105,10 +89,6 @@ const getAllScholarshipSubjects = async () => {
 }
 
 const updateScholarshipSubject = async (id, body) => {
-    if(!body.name || !body.type_id){
-        throw new Error('Name and type_id are required');
-    }
-
     let type = await Scholarship.checkTypeIdExist(body.type_id);
     if(type.length === 0){
         throw new Error('Scholarship type ID not found');
@@ -122,9 +102,6 @@ const updateScholarshipSubject = async (id, body) => {
 }
 
 const deleteScholarshipSubject = async (id) => {
-    if(!id) {
-        throw new Error('Scholarship subject ID is required');
-    }
 
     let result = await Scholarship.deleteScholarshipSubject(id)
     if (result.affectedRows === 0) {
@@ -135,9 +112,6 @@ const deleteScholarshipSubject = async (id) => {
 
 
 const createScholarshipTrack = async (body) => {
-    if(!body.subtype_id || !body.name){
-        throw new Error('subtype_id and name are required');
-    }
 
     let subjectType = await Scholarship.checkTypeIdExist(body.subtype_id);
     if(subjectType.length === 0) {
@@ -158,9 +132,6 @@ const getAllScholarshipTracks = async () => {
 }
 
 const updateScholarshipTrack = async (id, body) => {
-    if(!body.subtype_id || !body.name){
-        throw new Error('subtype_id and name are required');
-    }
 
     let subjectType = await Scholarship.checkScholarshipTypeIdExist(body.subtype_id);
     if(subjectType.length === 0) {
