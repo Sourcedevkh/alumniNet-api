@@ -15,13 +15,13 @@ router.post(
   studentController.createStudent,
 );
 
-router.post(
+router.put(
   "/update-profile/:id",
   handleProfileUpload,
   studentController.updateStudentProfile,
 );
 
-router.post(
+router.put(
   "/update-info/:id",
   validate(createStudent),
   studentController.updateStudentInfo,
@@ -30,6 +30,11 @@ router.post(
 router.delete("/delete/:id", studentController.deleteStudent);
 router.get("/all", studentController.getAllStudents);
 router.get("/id/:id", studentController.getStudentById);
-router.post("/add", studentController.addStudentToClass);
+
+// Add student to class
+router.post("/add-class", studentController.addStudentToClass);
+router.delete("/remove/classes/:class_id/students/:student_id", studentController.removeStudentFromClass);
+router.get("/by-class/:class_id", studentController.getStudentsByClassId);
+router.get("/by-student/:student_id", studentController.getClassesByStudentId);
 
 module.exports = router;

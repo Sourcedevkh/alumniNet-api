@@ -147,11 +147,6 @@ const createStudent = Joi.object({
         .messages({
             'any.required': 'Scholarship is required'
         }),
-    class_id: Joi.number()
-        .required()
-        .messages({
-            'any.required': 'Class is required'
-        }),
     shift_id: Joi.number()
         .required()
         .messages({
