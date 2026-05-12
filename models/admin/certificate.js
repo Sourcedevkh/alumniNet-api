@@ -65,7 +65,9 @@ const createCertificate = async (body) => {
 };
 
 const deleteCertificate = async (id) => {
-    await pool.query('DELETE FROM certificates WHERE id = ?', [id]);
+    let [rows] = await pool.query('DELETE FROM certificates WHERE id = ?', [id]);
+        
+    return rows[0];
 }
 
 module.exports = {
