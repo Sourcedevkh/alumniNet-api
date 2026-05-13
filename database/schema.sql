@@ -148,7 +148,7 @@ CREATE TABLE users (
     password VARCHAR(255) NOT NULL,
     profile_url VARCHAR(500) NULL,
     cloudinary_id VARCHAR(225) NULL,
-    token VARCHAR(255),
+    token TEXT,
     reset_token VARCHAR(100) NULL,
     phone VARCHAR(20),
     address TEXT,
@@ -160,6 +160,52 @@ CREATE TABLE users (
     otp_code VARCHAR(6) DEFAULT NULL,
     otp_expires_at DATETIME DEFAULT NULL,
     last_login_at DATETIME NULL,
+    last_login_ip VARCHAR(45) NULL,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+);
+
+CREATE TABLE user_devices (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    user_id INT NOT NULL,
+    device_id VARCHAR(255) NOT NULL,
+    device_name VARCHAR(100),
+    browser_name VARCHAR(100),
+    user_agent TEXT,
+    last_ip VARCHAR(45),
+    last_login_at DATETIME,
+    is_trusted TINYINT DEFAULT 0,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
+    UNIQUE KEY unique_device (device_id)
+);
+
+CREATE TABLE login_attempts (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    email VARCHAR(255) NOT NULL,
+    ip_address VARCHAR(45) NOT NULL,
+    device_id VARCHAR(255) NOT NULL,
+    attempt_count INT DEFAULT 1,
+    blocked_until DATETIME NULL,
+    block_level TINYINT DEFAULT 0 COMMENT '0=none, 1=5min, 2=10min, 3=permanent',
+    last_attempt_at DATETIME,
+    UNIQUE KEY unique_attempt (email, ip_address, device_id)
+);
+
+CREATE TABLE ip_attempts (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    ip_address VARCHAR(45) NOT NULL UNIQUE,
+    attempt_count INT DEFAULT 1,
+    blocked_until DATETIME NULL,
+    last_attempt_at DATETIME
+);
+
+CREATE TABLE user_login_logs (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    user_id INT NOT NULL,
+    ip_address VARCHAR(45),
+    user_agent TEXT,
+    success TINYINT DEFAULT 0,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
 );
