@@ -7,7 +7,7 @@ const getAllGrades = async () => {
         SELECT 
             g.id,
             g.student_id,
-            s.name AS student_name,
+            s.fullname AS student_name,
             g.grade,
             g.gpa,
             g.created_at,
@@ -27,7 +27,7 @@ const getGradeById = async (id) => {
         SELECT 
             g.id,
             g.student_id,
-            s.name AS student_name,
+            s.fullname AS student_name,
             g.grade,
             g.gpa,
             g.created_at,
@@ -63,7 +63,7 @@ const createGrade = async (body) => {
         SELECT 
             g.id,
             g.student_id,
-            s.name AS student_name,
+            s.fullname AS student_name,
             g.grade,
             g.gpa,
             g.created_at,
