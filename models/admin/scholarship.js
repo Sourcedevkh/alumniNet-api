@@ -98,6 +98,14 @@ const getAllScholarshipTracks = async () => {
     return rows;
 };
 
+const findScholarshipByName = async (name) => {
+    const [rows] = await pool.query(
+        `SELECT * FROM scholarships WHERE LOWER(name) = LOWER(?)`,
+        [name]
+    );
+    return rows;
+};
+
 const getScholarshipTrackById = async (id) => {
     const [rows] = await pool.query(`
         SELECT 
@@ -352,5 +360,6 @@ module.exports = {
     checkScholarshipIdExist,
     checkSubjectIdsExist,
     getScholarshipSubjectsBatch,
-    checkScholarshipTrackIdExist
+    checkScholarshipTrackIdExist,
+    findScholarshipByName
 }

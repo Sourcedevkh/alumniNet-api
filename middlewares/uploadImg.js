@@ -1,23 +1,23 @@
 const multer = require("multer");
-const CloudinaryStorage = require("multer-storage-cloudinary");
+const { CloudinaryStorage } = require("multer-storage-cloudinary");
 const cloudinary = require("../config/cloudinary");
 
-const storage = CloudinaryStorage({
+const storage = new CloudinaryStorage({
   cloudinary: cloudinary,
   params: {
-    folder: "alumniNet", // folder name in Cloudinary
+    folder: "alumniNet",
     allowed_formats: ["jpg", "jpeg", "png"],
     transformation: [
-      { width: 500, height: 500, crop: "limit" },// optional: auto resize
-      { quality: "auto:eco", fetch_format: "auto" }, // ជួយបង្រួមទំហំ file ឲ្យតូចបំផុតតែរូបភាពនៅច្បាស់
-    ], 
+      { width: 500, height: 500, crop: "limit" },
+      { quality: "auto:eco", fetch_format: "auto" },
+    ],
   },
 });
 
 const uploadImg = multer({
   storage: storage,
   limits: {
-    fileSize: 2 * 1024 * 1024, // កំណត់ទំហំត្រឹម 2MB (គិតជា Bytes)
+    fileSize: 2 * 1024 * 1024,
   },
 });
 
