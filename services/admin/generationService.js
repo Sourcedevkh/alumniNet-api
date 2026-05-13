@@ -1,13 +1,11 @@
 const generationModel = require("../../models/admin/generation");
 const { createGenerationSchema } = require("../../validators/generation");
 
-// ==== get all generation
 const getAllGeneration = async () => {
     const result = await generationModel.getAllGenerations();
     return result;
 }
 
-// ======== Create
 const createGeneration = async (body) => {
     let { name, start_year, end_year, intake_month } = body;
 
@@ -24,7 +22,6 @@ const createGeneration = async (body) => {
         throw error;
     }
 
-    
     if (intake_month !== undefined) {
         const totalMonths = parseInt(intake_month);
         const years = Math.floor(totalMonths / 12);
@@ -40,12 +37,10 @@ const createGeneration = async (body) => {
         body.end_year = parseInt(start_year) + years;
     }
 
-
     const result = await generationModel.createGeneration(body);
     return result;
 };
 
-// ====== find by id
 const findGenerationByid = async (id) => {
     const result = await generationModel.findGenerationByid(id);
 
@@ -57,7 +52,6 @@ const findGenerationByid = async (id) => {
 
 };
 
-// ========= update
 const updateGeneration = async (id, body) => {
     let { intake_month, start_year } = body;
 
@@ -92,7 +86,6 @@ const updateGeneration = async (id, body) => {
     return result;
 };
 
-// ====== delete
 const deleteGeneration = async (id) => {
     const result = await generationModel.deleteGeneration(id);
 
