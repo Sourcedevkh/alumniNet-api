@@ -34,7 +34,7 @@ const getCertificateById = async (req, res) => {
     try {
         let id = req.params.id;
         let result = await certificateService.getCertificateById(id);
-        sendResponse(res, 200, true, 'Certificate get by id successfully', result);
+        sendResponse(res, 200, true, 'Certificate get by id successfully', [result]);
     }catch (error) {
         sendResponse(res, 400, false, error.message);
     }

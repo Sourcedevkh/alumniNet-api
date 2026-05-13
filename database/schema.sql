@@ -209,3 +209,6 @@ CREATE TABLE user_login_logs (
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
 );
+
+-- ADD COLUMN
+ALTER TABLE students ADD grade_id INT NOT NULL;
