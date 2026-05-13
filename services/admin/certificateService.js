@@ -26,7 +26,8 @@ const deleteCertificate = async (id) => {
         throw new Error('Certificate not found');
     }
 
-    const [result] = await pool.query('DELETE FROM certificates WHERE id = ?', [id]);
+    let result = await certificate.deleteCertificate(id);
+    
     return result;
 }
 
