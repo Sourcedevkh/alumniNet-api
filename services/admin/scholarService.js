@@ -138,7 +138,7 @@ const updateScholarshipTrack = async (id, body) => {
         throw new Error('Scholarship subject type ID not found');
     }
 
-    let existing = await Scholarship.findScholarshipTypeByName(body.name);
+    let existing = await Scholarship.findScholarshipByName(body.name);
     if(existing.length > 0) {
         throw new Error('Scholarship track name already exists');
     }

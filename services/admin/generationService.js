@@ -92,6 +92,7 @@ const deleteGeneration = async (id) => {
     if(result.affectedRows === 0) {
         throw new Error("Generation not found or already deleted");
     }
+    
 
 };
 
