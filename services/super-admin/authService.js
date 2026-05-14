@@ -3,6 +3,7 @@ const jwt = require('jsonwebtoken');
 const crypto = require('crypto');
 const User = require('../../models/super-admin/user');
 const emailService = require('../../utils/emailService');
+const Attempt = require('../../models/admin/attempt');
 
 const create = async (body) => {
     let {fullname, email, password} = body;
@@ -53,8 +54,19 @@ const resetAdminPassword = async (id, newPassword) =>{
     return {id: id, email: adminRows[0].email};
 }
 
+const unlockAccount = async (email) => {
+    const rows = await Attempt.isPermanentlyBlocked(email);
+
+    if (rows.length === 0) {
+        throw new Error(`No permanently blocked account found for ${email}`);
+    }
+
+    await Attempt.unlockAccount(email);
+};
+
 module.exports = {
     create,
     adminStatus,
-    resetAdminPassword
+    resetAdminPassword,
+    unlockAccount
 }
