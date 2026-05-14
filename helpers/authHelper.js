@@ -7,9 +7,9 @@ const verifyPassword = async (plain, hashed) => {
     return bcrypt.compare(plain, hashed);
 };
 
-const generateAndStoreToken = async (userId, email, deviceId) => {
+const generateAndStoreToken = async (userId, email, deviceId, role) => {
     const token = jwt.sign(
-        { id: userId, email, device_id: deviceId },
+        { id: userId, email, device_id: deviceId, role },
         jwtConfig.secret,
         { expiresIn: jwtConfig.expiresIn }
     );
