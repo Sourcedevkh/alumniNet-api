@@ -1,7 +1,7 @@
 const authService = require('../../services/super-admin/authService');
-const {sendResponse} = require('../../utils/responseHelper');
+const { sendResponse } = require('../../utils/responseHelper');  
 
-const register = async(req, res) =>{
+const register = async (req, res) => {
     try {
         let arrs = req.validateBody;
         let result = await authService.create(arrs);
@@ -11,12 +11,12 @@ const register = async(req, res) =>{
     }
 }
 
-const changeStatus = async(req, res) =>{
+const changeStatus = async (req, res) => {
     try {
-        const {id} = req.params;
+        const { id } = req.params;
         const status = req.body.status;
 
-        if(status != 0 && status != 1){
+        if (status != 0 && status != 1) {
             return sendResponse(res, 400, false, 'Status must be 0 (disable) OR 1 (enable)');
         }
         let updateAdmin = await authService.adminStatus(id, status);
@@ -26,7 +26,7 @@ const changeStatus = async(req, res) =>{
     }
 }
 
-const resetAdminPassword = async(req, res) => {
+const resetAdminPassword = async (req, res) => {
     try {
         const id = req.params.id;
         const newPassword = req.validateBody.newPassword;
@@ -38,8 +38,20 @@ const resetAdminPassword = async(req, res) => {
     }
 }
 
+const unlockAccount = async (req, res) => {
+    try {
+        const { email } = req.body;
+        await authService.unlockAccount(email);
+        return sendResponse(res, 200, true, `Account ${email} has been unlocked`);
+    } catch (error) {
+        return sendResponse(res, 400, false, error.message);
+    }
+};
+
+
 module.exports = {
     register,
     changeStatus,
-    resetAdminPassword
+    resetAdminPassword,
+    unlockAccount
 }
