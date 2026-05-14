@@ -51,18 +51,18 @@ const findScholarshipSubjectByName = async (name) => {
     let [rows] = await pool.query('SELECT * FROM scholarship_subtypes WHERE name = ?', [name]);
     return rows;
 }
+
+const getScholarshipSubjectById = async (id) => {
+    let [rows] = await pool.query('SELECT ss.*, st.name AS type_name FROM scholarship_subtypes ss JOIN scholarship_types st ON ss.type_id = st.id WHERE ss.id = ?', [id]);
+    return rows;
+}
 const createScholarshipSubject = async (body) => {
     const [result] = await pool.query(
         'INSERT INTO scholarship_subtypes (type_id, name) VALUES (?, ?)',
         [body.type_id, body.name]
     );
 
-    const [rows] = await pool.query(`
-        SELECT ss.*, st.name AS type_name 
-        FROM scholarship_subtypes ss
-        JOIN scholarship_types st ON ss.type_id = st.id
-        WHERE ss.id = ?
-    `, [result.insertId]);
+    const [rows] = await pool.query('SELECT ss.*, st.name AS type_name FROM scholarship_subtypes ss JOIN scholarship_types st ON ss.type_id = st.id WHERE ss.id = ?', [result.insertId]);
 
     return rows[0];
 };
@@ -351,6 +351,7 @@ module.exports = {
     findScholarshipSubjectByName,
     getScholarshipById,
     getAllScholarships,
+    getScholarshipSubjectById,
     getScholarshipSubjects,
     createScholarship,
     updateScholarship,

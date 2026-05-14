@@ -51,17 +51,9 @@ const getAll = async (req, res) => {
 const updateClass = async (req, res) => {
     try {
         let {id} = req.params;
-        let { name, description, generation_id, scholarship_id, shift_id } = req.validateBody;
-
-        await classesService.updateClass(id, {
-            name,
-            description,
-            generation_id,
-            scholarship_id,
-            shift_id
-        });
-
-        return sendResponse(res, 200, true, 'Class updated successed');
+        let body = req.body;
+        let result = await classesService.updateClass(id, body);
+        return sendResponse(res, 200, true, 'Class updated successed', result);
     } catch (error) {
         return sendResponse(res, 400, false, error.message);
     }

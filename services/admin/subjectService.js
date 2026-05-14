@@ -38,33 +38,22 @@ const createSubject = async (body) => {
 };
 
 const updateSubject = async (id, body) => {
-  const { error, value } = updateSubjectSchema.validate(body, {
-    abortEarly: false,
-    allowUnknown: true
-  });
+    body.name = body.name?.trim();
 
-  if (error) {
-    throw new Error(error.details[0].message);
-  }
-
-  if (value.name !== undefined) {
-    const existing = await Subject.findSubjectByName(value.name);
-    if (existing.length > 0 && existing[0].id !== Number(id)) {
-      throw new Error('Subject name already exists');
+    const subject = await Subject.checkSubjectIdExist(id);
+    if (subject.length === 0) {
+        throw new Error('Subject ID not found');
     }
-  }
 
-  const subject = await Subject.checkSubjectIdExist(id);
-  if (subject.length === 0) {
-    throw new Error('Subject ID not found');
-  }
+    const existing = await Subject.findSubjectByName(body.name);
 
-  const [result] = await Subject.updateSubject(id, {
-    name: value.name !== undefined ? value.name : null,
-    description: value.description !== undefined ? value.description : null,
-  });
+    if (existing.length > 0 && existing[0].id != id) {
+        throw new Error('Subject name already exists');
+    }
 
-  return result[0];
+    const result = await Subject.updateSubject(id, body);
+
+    return result;
 };
 
 const deleteSubject = async (id) => {
@@ -78,7 +67,7 @@ const deleteSubject = async (id) => {
     throw new Error('Subject ID not found');
   }
 
-  return { id: Number(id) };
+  return result[0];
 };
 
 module.exports = {
