@@ -2,13 +2,22 @@ const Joi = require('joi');
 
 const updateProfileSchema = Joi.object({
     fullname: Joi.string()
-        .min(4)
+        .trim()
+        .pattern(/^[A-Za-z\s]+$/)
+        .min(3)
         .max(100)
-        .optional()
+        .required()
         .messages({
-            'string.min': 'Fullname must be at least 4 characters long',
-            'string.max': 'Fullname must not exceed 100 characters'
-        }),
+            "string.empty": "Full name is required",
+            "string.pattern.base":
+                "Full name can only contain letters and spaces",
+            "string.min":
+                "Full name must be at least 3 characters",
+            "string.max":
+                "Full name cannot exceed 100 characters",
+            "any.required":
+                "Full name is required"
+    }),
     gender: Joi.number()
         .valid(0, 1)
         .optional()

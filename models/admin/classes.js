@@ -73,9 +73,14 @@ const getClassbyId = async (classId) => {
 };
 
 const findById = async (id) => {
-    let [rows] = await pool.query('SELECT * FROM classes WHERE id = ?', [id]);
-    return rows;
+    const [rows] = await pool.query(
+        'SELECT * FROM classes WHERE id = ?',
+        [id]
+    );
+
+    return rows[0] || null;
 }
+
 
 const getAllClasses = async () => {
     const sql = `
@@ -100,11 +105,22 @@ const getAllClasses = async () => {
 };
 
 const update = async (id, data) => {
-    let arrs = [data.name, data.description, data.generation_id, data.scholarship_id, data.shift_id, id];
-    const sql = `UPDATE classes SET name = COALESCE(?, name), description = COALESCE(?, description), generation_id = COALESCE(?, generation_id), scholarship_id = COALESCE(?, scholarship_id), shift_id = COALESCE(?, shift_id) WHERE id = ?`;
-    const [result] = await pool.query(sql, arrs);
-    return result.affectedRows > 0;
-}
+    const { name, description, generation_id, scholarship_id, shift_id } = data;
+
+    await pool.query(
+        `UPDATE classes 
+         SET name = ?, description = ?, generation_id = ?, scholarship_id = ?, shift_id = ?
+         WHERE id = ?`,
+        [name, description, generation_id, scholarship_id, shift_id, id]
+    );
+
+    const [rows] = await pool.query(
+        `SELECT * FROM classes WHERE id = ?`,
+        [id]
+    );
+
+    return rows[0];
+};
 
 // Status: 1 = active, 0 = closed
 const updateStatus = async (id, status) => {

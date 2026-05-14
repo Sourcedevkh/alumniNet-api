@@ -3,7 +3,7 @@ const router = express.Router();
 const subjectController = require('../../controllers/admin/subjectController');
 const { isLogin } = require('../../middlewares/auth');
 const validate = require('../../middlewares/validate');
-const { createSubjectSchema, updateSubjectSchema } = require('../../validators/subject');
+const {createSubjectSchema, updateSubjectSchema} = require('../../validators/subject');
 
 router.post('/',isLogin, validate(createSubjectSchema), subjectController.createSubject);
 router.get('/', isLogin, subjectController.getAllSubjects);

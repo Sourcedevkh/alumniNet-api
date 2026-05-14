@@ -106,53 +106,100 @@ const resetAdminSchema = Joi.object({
 });
 
 const createStudent = Joi.object({
+
     fullname: Joi.string()
+        .trim()
+        .pattern(/^[A-Za-z\u1780-\u17FF\s]+$/)
         .min(3)
         .max(50)
         .required()
         .messages({
-            'string.min': 'Name must be at least 3 characters long',
-            'any.required': 'Name is required'
+            "string.empty": "Full name is required",
+            "string.pattern.base":
+                "Full name can only contain English letters, Khmer letters, and spaces",
+            "string.min":
+                "Full name must be at least 3 characters long",
+            "string.max":
+                "Full name cannot exceed 50 characters",
+            "any.required":
+                "Full name is required"
         }),
+
     phone: Joi.string()
-        .min(7)
-        .pattern(/^[0-9]+$/)
-        .allow('', null)
+        .trim()
+        .pattern(/^[0-9]{7,15}$/)
+        .allow("", null)
         .optional()
         .messages({
-            'string.min': 'Phone number must be at least 7 characters long',
-            'string.pattern.base': 'Phone number must contain only digits' 
+            "string.pattern.base":
+                "Phone number must contain only digits and be between 7 and 15 numbers"
         }),
+
     gender: Joi.number()
+        .integer()
         .valid(0, 1)
-        .empty('')
+        .empty("")
         .default(0)
         .messages({
-            'any.only': 'Gender must be 0 (Male) or 1 (Female)'
+            "any.only":
+                "Gender must be 0 (Male) or 1 (Female)"
         }),
+
     status: Joi.string()
-        // .valid('Graduate', 'Studying', 'Suspend')
-        .empty('')
-        .default('Graduate')
+        .trim()
+        .valid("Graduate", "Studying", "Suspend")
+        .empty("")
+        .default("Graduate")
         .messages({
-            'string.base': 'Status must be (Text)'
+            "any.only":
+                "Status must be Graduate, Studying, or Suspend"
         }),
+
     generation_id: Joi.number()
+        .integer()
+        .positive()
         .required()
         .messages({
-            'any.required': 'Generation is required'
+            "number.base":
+                "Generation ID must be a number",
+            "number.positive":
+                "Generation ID must be positive",
+            "any.required":
+                "Generation is required"
         }),
+
     scholarship_id: Joi.number()
+        .integer()
+        .positive()
         .required()
         .messages({
-            'any.required': 'Scholarship is required'
+            "number.base":
+                "Scholarship ID must be a number",
+            "number.positive":
+                "Scholarship ID must be positive",
+            "any.required":
+                "Scholarship is required"
         }),
+
     shift_id: Joi.number()
+        .integer()
+        .positive()
         .required()
         .messages({
-            'any.required': 'Shift is required'
+            "number.base":
+                "Shift ID must be a number",
+            "number.positive":
+                "Shift ID must be positive",
+            "any.required":
+                "Shift is required"
         }),
+
 })
+.options({
+    abortEarly: false,
+    allowUnknown: false,
+    stripUnknown: true
+});
 
 module.exports = {
     createUserSchema,

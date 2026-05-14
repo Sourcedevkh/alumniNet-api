@@ -2,17 +2,18 @@ const Joi = require("joi");
 
 const generationSchema = Joi.object({
     name: Joi.string()
-        .trim()
-        .min(3)
-        .max(150)
-        .required()
-        .messages({
-            "string.empty": "Name is required",
-            "string.min": "Name must be at least 3 characters",
-            "string.max": "Name cannot exceed 150 characters",
-            "any.required": "Name is required"
-        }),
-
+    .trim()
+    .pattern(/^[A-Za-z0-9\s-_]+$/)
+    .min(3)
+    .max(150)
+    .required()
+    .messages({
+        "string.empty": "Name is required",
+        "string.pattern.base": "Name can only contain letters, numbers, spaces, - and _",
+        "string.min": "Name must be at least 3 characters",
+        "string.max": "Name cannot exceed 150 characters",
+        "any.required": "Name is required"
+    }),
     description: Joi.string()
         .trim()
         .min(5)

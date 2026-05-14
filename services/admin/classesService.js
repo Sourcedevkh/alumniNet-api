@@ -24,7 +24,6 @@ const getClassWithRoster = async (id) => {
 const getAllClasses = async () => {
     const classes = await Class.getAllClasses();
 
-    // Set value of Shift
     const formatShift = (val) => {
         const shifts = { 0: "Morning", 1: "Afternoon", 2: "Evening" };
         return shifts[val] || "Not Set";
@@ -47,17 +46,25 @@ const getAllClasses = async () => {
 
 
 const updateClass = async (id, data) => {
-    let existClass = await Class.findById(id);
-    if(existClass.length === 0) throw new Error('Class not found');
 
-    if(data.name && data.name !== existClass[0].name) {
-        let nameExist = await Class.findByName(data.name);
-        if(nameExist.length > 0) throw new Error(`Class name ${data.name} already exists`);
+    const existClass = await Class.findById(id);
+
+    if (!existClass) {
+        throw new Error('Class not found');
     }
-    const isUpdated = await Class.update(id, data);
-    if(!isUpdated) throw new Error('Failed to update class');
-    return true;
-}
+
+    if (data.name && data.name !== existClass.name) {
+        const nameExist = await Class.findByName(data.name);
+
+        if (nameExist.length > 0) {
+            throw new Error(`Class name ${data.name} already exists`);
+        }
+    }
+
+    const updated = await Class.update(id, data);
+
+    return updated;
+};
 
 const archiveClass = async (id) => {
     let isStatus = await Class.updateStatus(id, 0);

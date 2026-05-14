@@ -1,16 +1,66 @@
 const Joi = require('joi');
 
 const classSchema = Joi.object({
-    name: Joi.string().min(3).max(10).required().messages({
-        'string.min': 'Class name must be at least 3 characters long',
-        'string.max': 'Class name must be at most 10 characters long',
-        'any.required': 'Class name is required'
+  name: Joi.string()
+    .trim()
+    .strict()
+    .min(1)
+    .max(50)
+    .pattern(/^[A-Za-z0-9\s\-]+$/) 
+    .required()
+    .messages({
+      "string.base": "name must be a string",
+      "string.empty": "name cannot be empty",
+      "string.min": "name is too short",
+      "string.max": "name is too long",
+      "string.pattern.base":
+        "name contains invalid characters (only letters, numbers, space, - allowed)",
+      "any.required": "name is required",
     }),
-    description: Joi.string().allow('', null),
-    generation_id: Joi.number().integer().required().messages({'number.base': 'Generation ID must be a number',}),
-    scholarship_id: Joi.number().integer().required().messages({'number.base': 'Scholarship ID must be a number',}),
-    shift_id: Joi.number().integer().required().messages({'number.base': 'Shift ID must be a number',}),
-});
+
+  description: Joi.string()
+    .trim()
+    .strict()
+    .max(255)
+    .pattern(/^[^<>$'"`]*$/) 
+    .allow("", null)
+    .messages({
+      "string.max": "description too long",
+      "string.pattern.base":
+        "description contains forbidden characters",
+    }),
+
+  generation_id: Joi.number()
+    .integer()
+    .positive()
+    .strict()
+    .required()
+    .messages({
+      "number.base": "generation_id must be a number",
+      "number.integer": "generation_id must be integer",
+      "number.positive": "generation_id must be positive",
+      "any.required": "generation_id is required",
+    }),
+
+  scholarship_id: Joi.number()
+    .integer()
+    .positive()
+    .strict()
+    .required(),
+
+  shift_id: Joi.number()
+    .integer()
+    .positive()
+    .strict()
+    .required(),
+})
+  .options({
+    abortEarly: false,    
+    stripUnknown: true,    
+    convert: true,        
+    allowUnknown: false,  
+  });
+
 
 const statusSchema = Joi.object({
     status: Joi.number().integer().valid(0, 1).required().messages({
