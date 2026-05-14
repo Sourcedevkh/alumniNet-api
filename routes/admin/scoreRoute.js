@@ -1,9 +1,11 @@
 const express = require("express");
 const router = express.Router();
-const scoreController = require("../../controllers/admin/scoreController");
+
 const { isLogin } = require('../../middlewares/auth');
 const validate = require('../../middlewares/validate');
-const { createScoreSchema, updateScoreSchema } = require('../../validators/score');
+
+const scoreController = require("../../controllers/admin/scoreController");
+const {  createScoreSchema, updateScoreSchema} = require('../../validators/score');
 
 router.post("/", isLogin, validate(createScoreSchema), scoreController.createScore);
 router.get("/", isLogin, scoreController.getAllScores);

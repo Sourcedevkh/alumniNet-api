@@ -6,7 +6,7 @@ const getAllCertificates = async () => {
         SELECT 
             c.id,
             c.student_id,
-            s.name AS student_name,
+            s.fullname AS student_name,
             c.issued_at,
             c.created_at,
             c.updated_at
@@ -28,7 +28,7 @@ const getCertificateById = async (id) => {
         SELECT 
             c.id,
             c.student_id,
-            s.name AS student_name,
+            s.fullname AS student_name,
             c.issued_at,
             c.created_at,
             c.updated_at
@@ -51,7 +51,7 @@ const createCertificate = async (body) => {
         SELECT 
             c.id,
             c.student_id,
-            s.name AS student_name,
+            s.fullname AS student_name,
             c.issued_at,
             c.created_at,
             c.updated_at
@@ -65,7 +65,9 @@ const createCertificate = async (body) => {
 };
 
 const deleteCertificate = async (id) => {
-    await pool.query('DELETE FROM certificates WHERE id = ?', [id]);
+    let [rows] = await pool.query('DELETE FROM certificates WHERE id = ?', [id]);
+        
+    return rows[0];
 }
 
 module.exports = {
