@@ -1,21 +1,31 @@
-const Attempt = require("../models/admin/attempt");
+const Attempt = require('../models/admin/attempt');
 
-const checkBlocked = async (email, ip, deviceId) => {
-    const attempt = await Attempt.findAttempt(email, ip, deviceId);
-    if (
-        attempt.length > 0 &&
-        attempt[0].blocked_until &&
-        new Date(attempt[0].blocked_until) > new Date()
-    ) {
-        throw new Error("Too many login attempts. Try again later.");
+const checkBlocked = async (userId, deviceId) => {
+    const attempt = await Attempt.findAttempt(userId, deviceId);
+    if (attempt.length === 0) return;
+
+    const record = attempt[0];
+    if (record.block_level === 3) {
+        throw new Error("Your account is permanently blocked. Please contact support.");
+    }
+    if (record.blocked_until && new Date(record.blocked_until) > new Date()) {
+        const minutesLeft = Math.ceil(
+            (new Date(record.blocked_until) - new Date()) / 1000 / 60
+        );
+        throw new Error(`Too many attempts. Try again in ${minutesLeft} minute(s).`);
     }
 };
-const handleFailed = async (email, ip, deviceId) => {
-    await Attempt.handleFailed(email, ip, deviceId);
+
+const handleFailed = async (userId, deviceId) => {
+    await Attempt.handleFailed(userId, deviceId);
 };
 
-const resetAttempt = async (email, ip, deviceId) => {
-    await Attempt.resetAttempt(email, ip, deviceId);
+const resetAttempt = async (userId, deviceId) => {
+    await Attempt.resetAttempt(userId, deviceId);
 };
 
-module.exports = { checkBlocked, handleFailed, resetAttempt };
+module.exports = { 
+    checkBlocked, 
+    handleFailed, 
+    resetAttempt 
+};
