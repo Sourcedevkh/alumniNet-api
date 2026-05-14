@@ -182,22 +182,14 @@ CREATE TABLE user_devices (
 
 CREATE TABLE login_attempts (
     id INT AUTO_INCREMENT PRIMARY KEY,
-    email VARCHAR(255) NOT NULL,
-    ip_address VARCHAR(45) NOT NULL,
+    user_id INT NOT NULL,
     device_id VARCHAR(255) NOT NULL,
     attempt_count INT DEFAULT 1,
     blocked_until DATETIME NULL,
     block_level TINYINT DEFAULT 0 COMMENT '0=none, 1=5min, 2=10min, 3=permanent',
     last_attempt_at DATETIME,
-    UNIQUE KEY unique_attempt (email, ip_address, device_id)
-);
-
-CREATE TABLE ip_attempts (
-    id INT AUTO_INCREMENT PRIMARY KEY,
-    ip_address VARCHAR(45) NOT NULL UNIQUE,
-    attempt_count INT DEFAULT 1,
-    blocked_until DATETIME NULL,
-    last_attempt_at DATETIME
+    UNIQUE KEY unique_attempt (user_id, device_id),
+    FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
 );
 
 CREATE TABLE user_login_logs (
