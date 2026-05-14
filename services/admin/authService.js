@@ -3,77 +3,77 @@ const User = require('../../models/admin/user');
 const jwt = require('jsonwebtoken');
 const bcrypt = require('bcrypt');
 const crypto = require('crypto');
-const {sendOTPEmail} = require('../../utils/emailService');
-const {generateOTP, getOTPExpiry} = require('../../utils/generateOTP');
+const { sendOTPEmail, sendVerificationEmail } = require('../../utils/emailService');
+const { generateOTP, getOTPExpiry } = require('../../utils/generateOTP');
+const { checkBlocked, handleFailed, resetAttempt } = require("../../helpers/attemptHelper");
+const { verifyPassword, generateAndStoreToken } = require("../../helpers/authHelper");
+const { updateUserOnLogin, trackDevice } = require("../../helpers/deviceHelper");
+const { logAttempt } = require("../../helpers/loggerHepler");
 
-const login = async (body) => {
-    let userInfo = await User.findByEmail(body.email);
-    if(userInfo.length === 0){
-        throw new Error('Email and Password invalid');
+const login = async (body, device) => {
+    const { email, password } = body;
+    const { ip, deviceId, userAgent } = device;
+    const user = await User.findByEmail(email);
+    if (user.length === 0) throw new Error("Email and Password invalid");
+
+    const userData = user[0];
+    const userId = userData.id;
+
+    if (!Number(userData.is_verified)) {
+        throw new Error("Please verify your email before logging in");
+    }
+    await checkBlocked(userId, deviceId);
+
+    const isMatch = await verifyPassword(password, userData.password);
+    if (!isMatch) {
+        await handleFailed(userId, deviceId);         
+        await logAttempt(userId, ip, userAgent, false);
+        throw new Error("Email and Password invalid");
     }
 
-    const isMatch = await bcrypt.compare(body.password, userInfo[0].password);
-    if(!isMatch){
-        throw new Error('Email and Password invalid');
-    }
+    await resetAttempt(userId, deviceId);           
+    await updateUserOnLogin(userId, ip);
+    await trackDevice({ userId, deviceId, userAgent, ip });
+    await logAttempt(userId, ip, userAgent, true);
 
-    if(!userInfo[0].is_verified){
-        throw new Error('Please verify your email before logging in');
-    }
+    const token = await generateAndStoreToken(userId, userData.email, deviceId, userData.role);
 
-    await User.updateLoginTime(userInfo[0].id);
-    const token = jwt.sign(
-        // payload
-        {
-            id: userInfo[0].id,
-            email: userInfo[0].email
-        },
-
-        // secret key and options
-        jwtConfig.secret,
-        {expiresIn: jwtConfig.expiresIn}
-    );
-
-    // save token to database 
-    await User.addToken(token, userInfo[0].id);
-
-    const data = await User.findById(userInfo[0].id);
-    const userObejct = data[0];
     return {
-        ...userObejct,
-        token: token
-    }
-}
-    
+        user: { id: userId, fullname: userData.fullname, email: userData.email, role: userData.role },
+        token,
+        device: { ip, device_id: deviceId },
+    };
+};
+
 const verifyEmail = async (token) => {
-    if(!token){
+    if (!token) {
         throw new Error('Token is required');
     }
 
     let userInfo = await User.findByVerificationEmail(token);
-    if(userInfo.length === 0){
+    if (userInfo.length === 0) {
         throw new Error('Invalid token');
     }
 
-    if(userInfo[0].is_verified){
-        throw new Error('Email already verified'); 
+    if (userInfo[0].is_verified) {
+        throw new Error('Email already verified');
     }
 
-    if(!userInfo[0].verification_expires || new Date(userInfo[0].verification_expires) < new Date()){
+    if (!userInfo[0].verification_expires || new Date(userInfo[0].verification_expires) < new Date()) {
         throw new Error('Link has expired, Please request a new verification email');
     }
 
     await User.verifyEmail(userInfo[0].id);
-    return {message: 'Email verified successed'};
+    return { message: 'Email verified successed' };
 }
 
 const resendVerificationLink = async (email) => {
     let userInfo = await User.findByEmail(email);
-    if(userInfo.length === 0){
+    if (userInfo.length === 0) {
         throw new Error('Email not found');
     }
 
-    if(userInfo[0].is_verified){
+    if (userInfo[0].is_verified) {
         throw new Error('Email already verified');
     }
 
@@ -86,9 +86,9 @@ const resendVerificationLink = async (email) => {
         verification_expires
     })
 
-    await emailService.sendVerificationEmail(email, verification_token);
-    return {message: 'Verification email sent, Please check your inbox'};
-    
+    await sendVerificationEmail(email, verification_token);
+    return { message: 'Verification email sent, Please check your inbox' };
+
 }
 
 const logout = async (id) => {
@@ -98,14 +98,14 @@ const logout = async (id) => {
 
 const requestOTP = async (email) => {
     const user = await User.findByEmail(email);
-    if(user.length === 0) throw new Error('Email not found');
+    if (user.length === 0) throw new Error('Email not found');
 
     let userInfo = user[0];
-    if(!userInfo.is_verified) throw new Error('Please verify your email before requesting OTP');
+    if (!userInfo.is_verified) throw new Error('Please verify your email before requesting OTP');
 
     let userName = userInfo.fullname;
     console.log(userName);
-    
+
     const otp = generateOTP();
     const expiresAt = getOTPExpiry(10);
 
@@ -115,8 +115,8 @@ const requestOTP = async (email) => {
 }
 
 const verifyOTP = async (email, code) => {
-    const userRows = await User.findByEmail(email); 
-    
+    const userRows = await User.findByEmail(email);
+
     if (userRows.length === 0) {
         throw new Error('Invalid OTP or OTP has expired');
     }
@@ -133,7 +133,7 @@ const verifyOTP = async (email, code) => {
     // Generate shortToken 32-character hex string
     const reset_token = crypto.randomBytes(16).toString('hex');
     await User.saveResetToken(userInfo.id, reset_token);
-    
+
     await User.clearOTP(userInfo.id);
 
     return reset_token;
@@ -155,7 +155,7 @@ const resetPWD = async (token, newPassword) => {
 
         return true;
     } catch (error) {
-        throw new Error(error.message); 
+        throw new Error(error.message);
     }
 }
 
