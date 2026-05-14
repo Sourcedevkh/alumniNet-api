@@ -1,93 +1,66 @@
 const { pool } = require('../../config/db');
 
-const findAttempt = async (email, ip, deviceId) => {
+const findAttempt = async (userId, deviceId) => {
     const [rows] = await pool.query(
         `SELECT * FROM login_attempts 
-         WHERE email = ? AND ip_address = ? AND device_id = ?`,
-        [email, ip, deviceId]
+         WHERE user_id = ? AND device_id = ?`,
+        [userId, deviceId]
     );
     return rows;
 };
 
-const createAttempt = async (email, ip, deviceId) => {
-    const [result] = await pool.query(
-        `INSERT INTO login_attempts (email, ip_address, device_id, attempt_count, last_attempt_at) 
-         VALUES (?, ?, ?, 1, NOW())`,
-        [email, ip, deviceId]
+const createAttempt = async (userId, deviceId) => {
+    await pool.query(
+        `INSERT INTO login_attempts (user_id, device_id, attempt_count, last_attempt_at) 
+         VALUES (?, ?, 1, NOW())`,
+        [userId, deviceId]
     );
-    return result;
 };
 
-const increaseAttempt = async (email, ip, deviceId) => {
-    const [result] = await pool.query(
+const increaseAttempt = async (userId, deviceId) => {
+    await pool.query(
         `UPDATE login_attempts 
          SET attempt_count = attempt_count + 1, last_attempt_at = NOW() 
-         WHERE email = ? AND ip_address = ? AND device_id = ?`,
-        [email, ip, deviceId]
+         WHERE user_id = ? AND device_id = ?`,
+        [userId, deviceId]
     );
-    return result;
 };
 
-const blockLevel1 = async (email, ip, deviceId) => {
+const blockLevel1 = async (userId, deviceId) => {
     await pool.query(
         `UPDATE login_attempts 
-         SET blocked_until = NOW() + INTERVAL 1 MINUTE,
-             block_level = 1,
-             attempt_count = 0
-         WHERE email = ? AND ip_address = ? AND device_id = ?`,
-        [email, ip, deviceId]
+         SET blocked_until = NOW() + INTERVAL 5 MINUTE,
+             block_level = 1, attempt_count = 0
+         WHERE user_id = ? AND device_id = ?`,
+        [userId, deviceId]
     );
 };
 
-const blockLevel2 = async (email, ip, deviceId) => {
+const blockLevel2 = async (userId, deviceId) => {
     await pool.query(
-        `UPDATE login_attempts
-        SET blocked_until = NOW() + INTERVAL 3 MINUTE,
-            block_level = 2,
-            attempt_count = 0
-        WHERE email = ? AND ip_address = ? AND device_id = ?`,
-        [email, ip, deviceId]
-    )
-}
+        `UPDATE login_attempts 
+         SET blocked_until = NOW() + INTERVAL 10 MINUTE,
+             block_level = 2, attempt_count = 0
+         WHERE user_id = ? AND device_id = ?`,
+        [userId, deviceId]
+    );
+};
 
-const blockLevel3 = async (email, ip, deviceId) => {
+const blockLevel3 = async (userId, deviceId) => {
     await pool.query(
-        `UPDATE login_attempts
-        SET blocked_until = NULL,
-            block_level = 3,
-            attempt_count = 0
-        WHERE email = ? AND ip_address = ? AND device_id = ?`,
-        [email, ip, deviceId]
-    )
-}
+        `UPDATE login_attempts 
+         SET blocked_until = NULL,
+             block_level = 3, attempt_count = 0
+         WHERE user_id = ? AND device_id = ?`,
+        [userId, deviceId]
+    );
+};
 
-// const blockDevice = async (email, ip, deviceId) => {
-//     const [result] = await pool.query(
-//         `UPDATE login_attempts 
-//          SET blocked_until = NOW() + INTERVAL 15 MINUTE
-//          WHERE email = ? AND ip_address = ? AND device_id = ?
-//          AND attempt_count >= 3`,
-//         [email, ip, deviceId]
-//     );
-//     return result;
-// };
+const handleFailed = async (userId, deviceId) => {
+    const attempt = await findAttempt(userId, deviceId);
 
-// const handleFailed = async (email, ip, deviceId) => {
-//     const attempt = await findAttempt(email, ip, deviceId);
-
-//     if (attempt.length > 0) {
-//         await increaseAttempt(email, ip, deviceId);
-//     } else {
-//         await createAttempt(email, ip, deviceId);
-//     }
-
-//     await blockDevice(email, ip, deviceId);
-// };
-
-const handleFailed = async (email, ip, deviceId) => {
-    const attempt = await findAttempt(email, ip, deviceId);
-    if(attempt.length === 0){
-        await createAttempt(email, ip, deviceId);
+    if (attempt.length === 0) {
+        await createAttempt(userId, deviceId);
         return;
     }
 
@@ -95,82 +68,53 @@ const handleFailed = async (email, ip, deviceId) => {
     const blockLevel = record.block_level;
     const count = record.attempt_count;
 
-    await increaseAttempt(email, ip, deviceId);
+    // level 3 — permanent, do nothing
+    if (blockLevel === 3) return;
 
-    // if wrong 3 times, blocked 5 minutes
-    if(blockLevel === 0 && count + 1 >= 3){
-        await blockLevel1(email, ip, deviceId);
+    await increaseAttempt(userId, deviceId);
+
+    if (blockLevel === 0 && count + 1 >= 3) {
+        await blockLevel1(userId, deviceId);
         return;
     }
 
-    // blocked 5m
-    if(blockLevel === 1 && count + 1 >=1){
-        await blockLevel2(email, ip, deviceId);
+    if (blockLevel === 1 && count + 1 >= 1) {
+        await blockLevel2(userId, deviceId);
         return;
     }
 
-    // blocked 15m
-    if(blockLevel === 2 && count + 1 >= 1){
-        await blockLevel3(email, ip, deviceId);
-
-        // locked ip permanently
-        await lockIP(ip);
+    if (blockLevel === 2 && count + 1 >= 1) {
+        await blockLevel3(userId, deviceId);
         return;
     }
-}
-
-const lockIP = async (ip) => {
-    await pool.query(
-        `INSERT INTO ip_attempts (ip_address, attempt_count, blocked_until, last_attempt_at)
-         VALUES (?, 1, '9999-12-31 23:59:59', NOW())
-         ON DUPLICATE KEY UPDATE
-         blocked_until = '9999-12-31 23:59:59',
-         last_attempt_at = NOW()`,
-        [ip]
-    );
-}
-
-const resetAttempt = async (email, ip, deviceId) => {
-    const [result] = await pool.query(
-        `DELETE FROM login_attempts 
-         WHERE email = ? AND ip_address = ? AND device_id = ?`,
-        [email, ip, deviceId]
-    );
-    return result;
 };
 
-const unlockAccount = async (email) => {
+const resetAttempt = async (userId, deviceId) => {
+    await pool.query(
+        `DELETE FROM login_attempts 
+         WHERE user_id = ? AND device_id = ?`,
+        [userId, deviceId]
+    );
+};
+
+const unlockAccount = async (userId) => {
     await pool.query(
         `UPDATE login_attempts
-         SET blocked_until = NULL,
-             block_level = 0,
-             attempt_count = 0
-         WHERE email = ?`,
-        [email]
-    );
-
-    // also unblock IP
-    await pool.query(
-        `UPDATE ip_attempts
-         SET blocked_until = NULL
-         WHERE ip_address IN (
-             SELECT ip_address FROM login_attempts WHERE email = ?
-         )`,
-        [email]
+         SET blocked_until = NULL, block_level = 0, attempt_count = 0
+         WHERE user_id = ?`,
+        [userId]
     );
 };
 
-// const unlockAccount = async (email) => {
-//     await pool.query(
-//          `SELECT * FROM login_attempts WHERE email = ? AND block_level = 3`,
-//         [email]
-//     )
-// }
+const isPermanentlyBlocked = async (email) => {
+    const [rows] = await pool.query('SELECT * FROM login_attempts WHERE email = ? AND block_level = 3', [email]);
+    return rows.length > 0;
+};
 
 module.exports = {
     findAttempt,
     handleFailed,
     resetAttempt,
     unlockAccount,
-    // unlockAccount
+    isPermanentlyBlocked
 };
