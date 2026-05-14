@@ -16,18 +16,23 @@ const createScoreSchema = Joi.object({
 });
 
 const updateScoreSchema = Joi.object({
-  student_id: Joi.number().integer().optional().messages({
+  student_id: Joi.number().integer().required().messages({
+    "any.required": "student_id is required",
     "number.base": "student_id must be a number",
     "number.integer": "student_id must be an integer",
   }),
-  subject_id: Joi.number().integer().optional().messages({
+
+  subject_id: Joi.number().integer().required().messages({
+    "any.required": "subject_id is required",
     "number.base": "subject_id must be a number",
     "number.integer": "subject_id must be an integer",
   }),
-  score: Joi.number().optional().messages({
+
+  score: Joi.number().required().messages({
+    "any.required": "score is required",
     "number.base": "score must be a number",
   }),
-}).or('student_id', 'subject_id', 'score');
+});
 
 module.exports = {
   createScoreSchema,

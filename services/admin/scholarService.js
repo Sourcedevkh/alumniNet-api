@@ -53,12 +53,14 @@ const deleteScholarshipType = async (id) => {
 
 const createScholarshipSubject = async (body) => {
     let { name, type_id } = body;
-     name = name.trim();
+
+    name = name.trim();
+
     if (name === '') {
         throw new Error('Scholarship subject name cannot be empty');
     }
 
-    let existing = await Scholarship.findScholarshipSubjectByName(name);
+    const existing = await Scholarship.findScholarshipSubjectByName(name);
     if (existing.length > 0) {
         throw new Error('Scholarship subject name already exists');
     }
@@ -68,18 +70,17 @@ const createScholarshipSubject = async (body) => {
         throw new Error('Scholarship name already exists');
     }
 
-
-    let type = await Scholarship.checkTypeIdExist(type_id);
+    const type = await Scholarship.checkTypeIdExist(type_id);
     if (type.length === 0) {
         throw new Error('Scholarship type ID not found');
     }
 
-    let result = await Scholarship.createScholarshipSubject({name,type_id});
-    return {
-        id: result.insertId,
+    const row = await Scholarship.createScholarshipSubject({
         name,
         type_id
-    };
+    });
+
+    return row;
 };
 
 const getAllScholarshipSubjects = async () => {
