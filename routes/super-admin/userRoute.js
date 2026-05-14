@@ -8,5 +8,6 @@ const { createUserSchema, resetAdminSchema } = require('../../validators/user')
 router.post('/register', validate(createUserSchema), SuperAdminController.register);
 router.put('/admin-status/:id', SuperAdminController.changeStatus);
 router.put('/resetAdmin-pwd/:id', validate(resetAdminSchema), SuperAdminController.resetAdminPassword);
+router.post('/unlock-acc', SuperAdminController.unlockAccount);
 
 module.exports = router;
