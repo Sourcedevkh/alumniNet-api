@@ -3,20 +3,22 @@ const {sendResponse} = require('../../utils/responseHelper');
 
 const login = async (req, res) => {
     try {
-        let arrs = req.validateBody;
-        const result = await authService.login(arrs);
+        const ip = req.clientIp;
+        const deviceInfo = req.device;
+
+        const result = await authService.login(req.validateBody, deviceInfo);
         return sendResponse(res, 200, true, 'Login succeeded', result);
     } catch (error) {
         return sendResponse(res, 400, false, error.message);
     }
-}
+};
 
 const verifyEmail = async (req, res) => {
     try {
         let result = await authService.verifyEmail(req.query.token);
         return sendResponse(res, 200, true, result);
     } catch (error) {
-        sendResponse(res, 400, { error: error.message });
+        return sendResponse(res, 400, false, error.message);
     }
 }
 
