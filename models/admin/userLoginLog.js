@@ -8,4 +8,12 @@ const createAttempt = async (userId, ip, userAgent, success) => {
     );
 };
 
-module.exports = { createAttempt };
+const getAllUserLoginAttempts = async () => {
+    const [rows] = await pool.query('SELECT * FROM user_login_logs');
+    return rows;
+}
+
+module.exports = { 
+    createAttempt,
+    getAllUserLoginAttempts
+};
