@@ -30,6 +30,7 @@ app.use('/api/admin/student', studentRoute);
 app.use('/api/admin/profile', profileRoute);
 app.use('/api/admin/score', scoreRoute);
 app.use('/api/admin/scholarship', scholarshipRoute);
+app.use('/api/scholarship', scholarshipRoute);
 app.use('/api/admin', certificateRoute);
 app.use('/api/admin/generations', generationRoute);
 app.use('/api/admin/subjects', subjectRoute);
