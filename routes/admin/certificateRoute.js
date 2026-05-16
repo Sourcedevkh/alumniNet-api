@@ -5,7 +5,7 @@ const certificateController = require('../../controllers/admin/certificateContro
 const { isLogin } = require('../../middlewares/auth');
 const validate = require('../../middlewares/validate');
 const { certificateSchema } = require('../../validators/certificate');
-const { authLimiter } = require('../../dist/middlewares/rateLimiter');
+const { authLimiter } = require('../../middlewares/rateLimiter');
 
 router.use(authLimiter); 
 

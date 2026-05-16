@@ -5,7 +5,7 @@ const ClassesController = require('../../controllers/admin/classesController');
 const { isLogin } = require('../../middlewares/auth');
 const validate = require('../../middlewares/validate');
 const { classSchema, statusSchema } = require('../../validators/classes');
-const { authLimiter } = require('../../dist/middlewares/rateLimiter');
+const { authLimiter } = require('../../middlewares/rateLimiter');
 
 router.use(authLimiter); 
 

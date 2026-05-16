@@ -6,7 +6,7 @@ const { isLogin } = require('../../middlewares/auth');
 const gradeController = require('../../controllers/admin/gradeController');
 const validate = require('../../middlewares/validate');
 const { gradeSchema } = require('../../validators/grade');
-const { authLimiter } = require('../../dist/middlewares/rateLimiter');
+const { authLimiter } = require('../../middlewares/rateLimiter');
 
 router.use(authLimiter); 
 

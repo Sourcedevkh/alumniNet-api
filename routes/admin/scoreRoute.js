@@ -6,7 +6,7 @@ const validate = require('../../middlewares/validate');
 
 const scoreController = require("../../controllers/admin/scoreController");
 const {  createScoreSchema, updateScoreSchema} = require('../../validators/score');
-const { authLimiter } = require('../../dist/middlewares/rateLimiter');
+const { authLimiter } = require('../../middlewares/rateLimiter');
 
 router.use(authLimiter); 
 
