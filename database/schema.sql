@@ -150,6 +150,7 @@ CREATE TABLE users (
     cloudinary_id VARCHAR(225) NULL,
     token TEXT,
     reset_token VARCHAR(100) NULL,
+    reset_token_expires DATETIME NULL,
     phone VARCHAR(20),
     address TEXT,
     role TINYINT NOT NULL DEFAULT 1 COMMENT '0: super_admin, 1: admin',
