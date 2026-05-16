@@ -6,7 +6,7 @@ const validate = require('../../middlewares/validate');
 const { updateProfileSchema } = require('../../validators/profile');
 const profileController = require('../../controllers/admin/profileController');
 const uploadImage = require('../../middlewares/uploadImg');
-const { authLimiter } = require('../../dist/middlewares/rateLimiter');
+const { authLimiter } = require('../../middlewares/rateLimiter');
 
 router.use(authLimiter); 
 

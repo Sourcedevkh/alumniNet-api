@@ -5,7 +5,7 @@ dotenv.config();
 
 const app = express();
 const PORT = process.env.PORT;
-const { apiLimiter } = require('./dist/middlewares/rateLimiter');
+const { apiLimiter } = require('./middlewares/rateLimiter');
 
 app.use(express.json());
 app.use(apiLimiter);

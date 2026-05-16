@@ -2,7 +2,7 @@ const express = require('express');
 const router = express.Router();
 
 const TrackController = require('../../controllers/super-admin/trackController');
-const { authLimiter } = require('../../dist/middlewares/rateLimiter');
+const { authLimiter } = require('../../middlewares/rateLimiter');
 
 router.use(authLimiter); 
 

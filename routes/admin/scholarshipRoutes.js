@@ -12,7 +12,7 @@ const {
   scholarshipCreateSchema,
   scholarshipUpdateSchema,
 } = require('../../validators/scholarship');
-const { authLimiter } = require('../../dist/middlewares/rateLimiter');
+const { authLimiter } = require('../../middlewares/rateLimiter');
 
 router.use(authLimiter); 
 

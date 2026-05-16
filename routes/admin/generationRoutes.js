@@ -6,7 +6,7 @@ const generationController = require("../../controllers/admin/generationControll
 const { isLogin } = require("../../middlewares/auth");
 const validate = require('../../middlewares/validate');
 const { generationSchema } = require("../../validators/generation");
-const { authLimiter } = require('../../dist/middlewares/rateLimiter');
+const { authLimiter } = require('../../middlewares/rateLimiter');
 
 router.use(authLimiter); 
 

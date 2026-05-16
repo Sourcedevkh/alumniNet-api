@@ -4,7 +4,7 @@ const router = express.Router();
 const SuperAdminController = require('../../controllers/super-admin/authController');
 const validate = require('../../middlewares/validate');
 const { createUserSchema, resetAdminSchema, emailSchema } = require('../../validators/user')
-const { authLimiter } = require('../../dist/middlewares/rateLimiter');
+const { authLimiter } = require('../../middlewares/rateLimiter');
 
 router.use(authLimiter); 
 
