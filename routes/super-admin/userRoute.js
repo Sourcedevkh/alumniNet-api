@@ -4,6 +4,9 @@ const router = express.Router();
 const SuperAdminController = require('../../controllers/super-admin/authController');
 const validate = require('../../middlewares/validate');
 const { createUserSchema, resetAdminSchema, emailSchema } = require('../../validators/user')
+const { authLimiter } = require('../../dist/middlewares/rateLimiter');
+
+router.use(authLimiter); 
 
 router.post('/register', validate(createUserSchema), SuperAdminController.register);
 router.put('/admin-status/:id', SuperAdminController.changeStatus);

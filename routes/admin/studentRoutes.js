@@ -8,6 +8,9 @@ const handleProfileUpload = require("../../middlewares/handleProfileUpload");
 const validate = require("../../middlewares/validate");
 const studentController = require("../../controllers/admin/studentController");
 const { studentSchema } = require("../../validators/student");
+const { authLimiter } = require('../../dist/middlewares/rateLimiter');
+
+router.use(authLimiter); 
 
 router.post(
   "/create",
