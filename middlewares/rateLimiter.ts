@@ -17,5 +17,7 @@ export const apiLimiter = rateLimit({
     message: {
         status: 429,
         error: "Too many requests. Please slow down."
-    }
+    },
+    standardHeaders: true,
+    legacyHeaders: false,
 });
