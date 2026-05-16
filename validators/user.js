@@ -42,10 +42,15 @@ const loginUserSchema = Joi.object({
 });
 
 const emailSchema = Joi.object({
-    email: Joi.string().email().required().messages({
-        'string.email': 'Please provide a valid email address (e.g., name@domain.com)',
-        'any.required': 'Email is required'
-    })
+    email: Joi.string()
+        .pattern(/^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/)
+        .required()
+        .messages({
+            'string.base': 'Email must be a string',
+            'string.empty': 'Email cannot be empty',
+            'string.pattern.base': 'Please provide a valid email address (e.g., name@domain.com)',
+            'any.required': 'Email is required'
+        })
 });
 
 const codeOTPSchema = Joi.object({
@@ -57,10 +62,15 @@ const codeOTPSchema = Joi.object({
 })
 
 const verifyOTPSchema = Joi.object({
-    email: Joi.string().email().required().messages({
-        'string.email': 'Please provide a valid email address (e.g., name@domain.com)',
-        'any.required': 'Email is required'
-    }),
+    email: Joi.string()
+        .pattern(/^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/)
+        .required()
+        .messages({
+            'string.base': 'Email must be a string',
+            'string.empty': 'Email cannot be empty',
+            'string.pattern.base': 'Please provide a valid email address (e.g., name@domain.com)',
+            'any.required': 'Email is required'
+        }),
     code: Joi.string().length(6).alphanum().required().messages({
         'string.length': 'OTP code must be 6 digits',
         'string.alphanum': 'OTP code must be alphanumeric',
@@ -69,10 +79,17 @@ const verifyOTPSchema = Joi.object({
 })
 
 const resetVerificationLinkSchema = Joi.object({
-    email: Joi.string().email().required().messages({
+    email: Joi.string()
+        .pattern(/^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/)
+        .required()
+        .messages({
+            'string.base': 'Email must be a string',
+            'string.empty': 'Email cannot be empty',
+            'string.pattern.base': 'Please provide a valid email address (e.g., name@domain.com)',
+            'any.required': 'Email is required'
+        }),
         'string.email': 'Please provide a valid email address (e.g., name@domain.com)',
         'any.required': 'Email is required'
-    })
 });
 
 const resetPasswordSchema = Joi.object({
