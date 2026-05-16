@@ -10,6 +10,7 @@ app.use(express.json());
 
 // Super-admin
 const authRoute = require('./routes/super-admin/userRoute');
+const trackRoute = require('./routes/super-admin/trackRoute');
 
 // Admin
 const authAdminRoute = require('./routes/admin/userRoutes');
@@ -25,11 +26,14 @@ const gradeRoute = require('./routes/admin/gradeRoute');
 
 
 app.use('/api/super-admin/auth', authRoute);
+app.use('/api/super-admin/track', trackRoute);
+
 app.use('/api/admin/auth', authAdminRoute);
 app.use('/api/admin/student', studentRoute);
 app.use('/api/admin/profile', profileRoute);
 app.use('/api/admin/score', scoreRoute);
 app.use('/api/admin/scholarship', scholarshipRoute);
+app.use('/api/scholarship', scholarshipRoute);
 app.use('/api/admin', certificateRoute);
 app.use('/api/admin/generations', generationRoute);
 app.use('/api/admin/subjects', subjectRoute);

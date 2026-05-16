@@ -111,10 +111,16 @@ const isPermanentlyBlocked = async (email) => {
     return rows.length > 0;
 };
 
+const getAllAttempts = async () => {
+    const [rows] = await pool.query('SELECT * FROM login_attempts');
+    return rows;
+};
+
 module.exports = {
     findAttempt,
     handleFailed,
     resetAttempt,
     unlockAccount,
-    isPermanentlyBlocked
+    isPermanentlyBlocked,
+    getAllAttempts
 };

@@ -2,18 +2,27 @@ const Joi = require('joi');
 
 const createUserSchema = Joi.object({
     fullname: Joi.string()
+        .trim()
         .min(3)
         .max(50)
+        .pattern(/^[a-zA-Z\s]+$/)
         .required()
         .messages({
+            'string.base': 'Fullname must be a string',
+            'string.empty': 'Fullname cannot be empty',
             'string.min': 'Fullname must be at least 3 characters long',
+            'string.max': 'Fullname cannot exceed 50 characters',
+            'string.pattern.base': 'Fullname must only contain letters and spaces',
             'any.required': 'Fullname is required'
         }),
+
     email: Joi.string()
-        .email()
+        .pattern(/^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/)
         .required()
         .messages({
-            'string.email': 'Please provide a valid email address (e.g., name@domain.com)',
+            'string.base': 'Email must be a string',
+            'string.empty': 'Email cannot be empty',
+            'string.pattern.base': 'Please provide a valid email address (e.g., name@domain.com)',
             'any.required': 'Email is required'
         }),
     password: Joi.string()
@@ -195,11 +204,11 @@ const createStudent = Joi.object({
         }),
 
 })
-.options({
-    abortEarly: false,
-    allowUnknown: false,
-    stripUnknown: true
-});
+    .options({
+        abortEarly: false,
+        allowUnknown: false,
+        stripUnknown: true
+    });
 
 module.exports = {
     createUserSchema,
