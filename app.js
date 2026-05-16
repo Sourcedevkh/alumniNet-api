@@ -5,8 +5,10 @@ dotenv.config();
 
 const app = express();
 const PORT = process.env.PORT;
+const { apiLimiter } = require('./dist/middlewares/rateLimiter');
 
 app.use(express.json());
+app.use(apiLimiter);
 
 // Super-admin
 const authRoute = require('./routes/super-admin/userRoute');
