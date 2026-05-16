@@ -5,6 +5,9 @@ const certificateController = require('../../controllers/admin/certificateContro
 const { isLogin } = require('../../middlewares/auth');
 const validate = require('../../middlewares/validate');
 const { certificateSchema } = require('../../validators/certificate');
+const { authLimiter } = require('../../dist/middlewares/rateLimiter');
+
+router.use(authLimiter); 
 
 router.post('/certificates', isLogin, validate(certificateSchema), certificateController.createCertificate);
 router.get('/certificates', isLogin, certificateController.getAllCertificates);
