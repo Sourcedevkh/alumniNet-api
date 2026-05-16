@@ -52,11 +52,57 @@ const createScore = async (body) => {
     throw err;
   }
 
-  await ensureStudentExists(value.student_id);
-  await ensureSubjectExists(value.subject_id);
+  let items = [];
+  if (Array.isArray(value)) {
+    items = value;
+  } else if (
+    value.student_id &&
+    Array.isArray(value.student_id) &&
+    Array.isArray(value.subject_id) &&
+    Array.isArray(value.score)
+  ) {
+    const isNumberArray = value.score.every((item) => typeof item === "number");
+    const isMatrix = value.score.every(
+      (item) => Array.isArray(item) && item.every((scoreValue) => typeof scoreValue === "number")
+    );
 
-  const rows = await scoreModel.createScore(value);
-  return rows[0] || rows;
+    if (isNumberArray) {
+      items = value.student_id.map((student_id, index) => ({
+        student_id,
+        subject_id: value.subject_id[index],
+        score: value.score[index],
+      }));
+    } else if (isMatrix) {
+      items = value.student_id.flatMap((student_id, rowIndex) =>
+        value.score[rowIndex].map((scoreValue, colIndex) => ({
+          student_id,
+          subject_id: value.subject_id[colIndex],
+          score: scoreValue,
+        }))
+      );
+    } else {
+      items = [value];
+    }
+  } else {
+    items = [value];
+  }
+
+  const uniqueStudentIds = [...new Set(items.map((item) => item.student_id))];
+  const uniqueSubjectIds = [...new Set(items.map((item) => item.subject_id))];
+
+  await Promise.all(uniqueStudentIds.map(ensureStudentExists));
+  await Promise.all(uniqueSubjectIds.map(ensureSubjectExists));
+
+  const createdScores = [];
+  for (const item of items) {
+    const rows = await scoreModel.createScore(item);
+    createdScores.push(rows[0] || rows);
+  }
+
+  return Array.isArray(value) ||
+    (value.student_id && Array.isArray(value.student_id))
+    ? createdScores
+    : createdScores[0];
 };
 
 const updateScore = async (id, body) => {
@@ -84,6 +130,77 @@ const updateScore = async (id, body) => {
 
   const rows = await scoreModel.updateScore(id, value);
   return rows[0] || rows;
+};
+
+const updateScoresBatch = async (body) => {
+  const { error, value } = createScoreSchema.validate(body, {
+    abortEarly: false,
+    allowUnknown: true,
+  });
+
+  if (error) {
+    const err = new Error(error.details[0].message);
+    err.statusCode = 400;
+    throw err;
+  }
+
+  let items = [];
+  if (Array.isArray(value)) {
+    items = value;
+  } else if (
+    value.student_id &&
+    Array.isArray(value.student_id) &&
+    Array.isArray(value.subject_id) &&
+    Array.isArray(value.score)
+  ) {
+    const isNumberArray = value.score.every((item) => typeof item === "number");
+    const isMatrix = value.score.every(
+      (item) => Array.isArray(item) && item.every((scoreValue) => typeof scoreValue === "number")
+    );
+
+    if (isNumberArray) {
+      items = value.student_id.map((student_id, index) => ({
+        student_id,
+        subject_id: value.subject_id[index],
+        score: value.score[index],
+      }));
+    } else if (isMatrix) {
+      items = value.student_id.flatMap((student_id, rowIndex) =>
+        value.score[rowIndex].map((scoreValue, colIndex) => ({
+          student_id,
+          subject_id: value.subject_id[colIndex],
+          score: scoreValue,
+        }))
+      );
+    } else {
+      items = [value];
+    }
+  } else {
+    items = [value];
+  }
+
+  const uniqueStudentIds = [...new Set(items.map((item) => item.student_id))];
+  const uniqueSubjectIds = [...new Set(items.map((item) => item.subject_id))];
+
+  await Promise.all(uniqueStudentIds.map(ensureStudentExists));
+  await Promise.all(uniqueSubjectIds.map(ensureSubjectExists));
+
+  const savedScores = [];
+  for (const item of items) {
+    const existing = await scoreModel.getScoreByStudentAndSubject(item.student_id, item.subject_id);
+    if (existing && existing.length > 0) {
+      const rows = await scoreModel.updateScore(existing[0].id, item);
+      savedScores.push(rows[0] || rows);
+    } else {
+      const rows = await scoreModel.createScore(item);
+      savedScores.push(rows[0] || rows);
+    }
+  }
+
+  return Array.isArray(value) ||
+    (value.student_id && Array.isArray(value.student_id))
+    ? savedScores
+    : savedScores[0];
 };
 
 const deleteScore = async (id) => {
@@ -119,6 +236,7 @@ module.exports = {
   getScoreById,
   createScore,
   updateScore,
+  updateScoresBatch,
   deleteScore,
   getStudentScores,
   getSubjectScores,
