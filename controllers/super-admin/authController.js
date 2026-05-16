@@ -26,13 +26,23 @@ const changeStatus = async (req, res) => {
     }
 }
 
-const resetAdminPassword = async (req, res) => {
+const forgotPassword = async (req, res) => {
     try {
-        const id = req.params.id;
+        const email = req.validateBody.email;
+        const result = await authService.requestPasswordReset(email);
+        return sendResponse(res, 200, true, result.message);
+    } catch (error) {
+        return sendResponse(res, 400, false, error.message);
+    }
+}
+
+const verifyAndResetPassword = async (req, res) => {
+    try {
+        const { token } = req.query;
         const newPassword = req.validateBody.newPassword;
 
-        await authService.resetAdminPassword(id, newPassword);
-        return sendResponse(res, 200, true, 'Admin password reset successed');
+        const result = await authService.verifyAndResetPassword(token, newPassword);
+        return sendResponse(res, 200, true, result.message);
     } catch (error) {
         return sendResponse(res, 400, false, error.message);
     }
@@ -52,6 +62,7 @@ const unlockAccount = async (req, res) => {
 module.exports = {
     register,
     changeStatus,
-    resetAdminPassword,
-    unlockAccount
+    unlockAccount,
+    forgotPassword,
+    verifyAndResetPassword
 }
