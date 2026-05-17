@@ -54,6 +54,16 @@ CREATE TABLE scholarships (
     FOREIGN KEY (track_id) REFERENCES scholarship_tracks(id)
 );
 
+CREATE TABLE scholarship_subjects (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    scholarship_id INT NOT NULL,
+    subject_id INT NOT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (scholarship_id) REFERENCES scholarships(id) ON DELETE CASCADE,
+    FOREIGN KEY (subject_id) REFERENCES subjects(id),
+    UNIQUE KEY unique_scholarship_subject (scholarship_id, subject_id)
+);
+
 CREATE TABLE generations (
     id INT AUTO_INCREMENT PRIMARY KEY,
     name VARCHAR(255) NOT NULL,

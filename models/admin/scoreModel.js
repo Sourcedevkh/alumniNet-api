@@ -40,6 +40,14 @@ const getScoreById = async (id) => {
   return rows;
 };
 
+const getScoreByStudentAndSubject = async (student_id, subject_id) => {
+  const [rows] = await pool.query(
+    `SELECT * FROM scores WHERE student_id = ? AND subject_id = ? LIMIT 1`,
+    [student_id, subject_id]
+  );
+  return rows;
+};
+
 const checkStudentIdExist = async (student_id) => {
   const [rows] = await pool.query('SELECT id FROM students WHERE id = ?', [student_id]);
   return rows;
@@ -150,6 +158,7 @@ const getScoresBySubjectId = async (subject_id) => {
 module.exports = {
   getAllScores,
   getScoreById,
+  getScoreByStudentAndSubject,
   checkStudentIdExist,
   checkSubjectIdExist,
   createScore,
