@@ -33,7 +33,10 @@ const generateCertificatePDF = (data) => {
     doc.font('Helvetica').fontSize(10).text(`Issued on: ${new Date(data.issued_at).toLocaleDateString()}`, 80, bottomY + 20);
 
     doc.font('Helvetica-Bold').fontSize(12).text('Authorized Signature', doc.page.width - 250, bottomY, { width: 170, align: 'center' });
-    doc.line(doc.page.width - 250, bottomY - 5, doc.page.width - 80, bottomY - 5).lineWidth(1).stroke('#475569');
+    doc.moveTo(doc.page.width - 250, bottomY - 5)
+        .lineTo(doc.page.width - 80, bottomY - 5)
+        .lineWidth(1)
+        .stroke('#475569');
 
     doc.end();
     return doc;
