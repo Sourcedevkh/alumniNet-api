@@ -14,4 +14,6 @@ router.get('/certificates', isLogin, certificateController.getAllCertificates);
 router.delete('/certificates/:id', isLogin, validate(certificateSchema), certificateController.deleteCertificate);
 router.get('/certificates/:id', isLogin, validate(certificateSchema), certificateController.getCertificateById);
 
+router.post('/certificates/generate-qrcode', certificateController.generateAdminQR);
+
 module.exports = router;
