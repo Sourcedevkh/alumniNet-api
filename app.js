@@ -5,11 +5,14 @@ dotenv.config();
 
 const app = express();
 const PORT = process.env.PORT;
+const { apiLimiter } = require('./middlewares/rateLimiter');
 
 app.use(express.json());
+app.use(apiLimiter);
 
 // Super-admin
 const authRoute = require('./routes/super-admin/userRoute');
+const trackRoute = require('./routes/super-admin/trackRoute');
 
 // Admin
 const authAdminRoute = require('./routes/admin/userRoutes');
@@ -22,9 +25,12 @@ const classRoute = require('./routes/admin/classesRoute');
 const scoreRoute = require('./routes/admin/scoreRoute');
 const certificateRoute = require('./routes/admin/certificateRoute');
 const gradeRoute = require('./routes/admin/gradeRoute');
+const certificatePublicRoute = require('./routes/certificateRoute');
 
 
 app.use('/api/super-admin/auth', authRoute);
+app.use('/api/super-admin/track', trackRoute);
+
 app.use('/api/admin/auth', authAdminRoute);
 app.use('/api/admin/student', studentRoute);
 app.use('/api/admin/profile', profileRoute);
@@ -35,7 +41,10 @@ app.use('/api/admin', certificateRoute);
 app.use('/api/admin/generations', generationRoute);
 app.use('/api/admin/subjects', subjectRoute);
 app.use('/api/admin/classes', classRoute);
-app.use('/api/admin', gradeRoute);
+app.use('/api/admin/grades', gradeRoute);
+
+// Public routes
+app.use('/api/certificates', certificatePublicRoute);
 
 
 app.listen(PORT, () => {

@@ -4,6 +4,9 @@ const subjectController = require('../../controllers/admin/subjectController');
 const { isLogin } = require('../../middlewares/auth');
 const validate = require('../../middlewares/validate');
 const {createSubjectSchema, updateSubjectSchema} = require('../../validators/subject');
+const { authLimiter } = require('../../middlewares/rateLimiter');
+
+router.use(authLimiter); 
 
 router.post('/',isLogin, validate(createSubjectSchema), subjectController.createSubject);
 router.get('/', isLogin, subjectController.getAllSubjects);

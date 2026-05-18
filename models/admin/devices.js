@@ -45,9 +45,52 @@ const upsertDevice = async (body) => {
     }
 };
 
+///////
+
+const getUserDevices = async (userId) => {
+    const [rows] = await pool.query(
+        `SELECT 
+            u.id,
+            u.fullname,
+            u.email,
+            ud.device_id,
+            ud.device_name,
+            ud.browser_name,
+            ud.last_ip,
+            ud.last_login_at
+            FROM users u
+            LEFT JOIN user_devices ud 
+            ON u.id = ud.user_id
+            WHERE u.id = ?`,
+        [userId]
+    )
+    return rows;
+}
+
+const getAllUserDevices = async () => {
+    const [rows] = await pool.query(
+        `SELECT 
+            u.id,
+            u.fullname,
+            u.email,
+            ud.device_id,
+            ud.device_name,
+            ud.browser_name,
+            ud.last_ip,
+            ud.last_login_at
+            FROM users u
+            LEFT JOIN user_devices ud 
+            ON u.id = ud.user_id
+            ORDER BY u.id, ud.last_login_at DESC`
+    )
+    return rows;
+}
+
 module.exports = {
     findByDeviceId,
     addDevice,
     updateDevice,
-    upsertDevice    
+    upsertDevice,
+    getUserDevices,
+    getAllUserDevices
 };

@@ -12,6 +12,9 @@ const {
   scholarshipCreateSchema,
   scholarshipUpdateSchema,
 } = require('../../validators/scholarship');
+const { authLimiter } = require('../../middlewares/rateLimiter');
+
+router.use(authLimiter); 
 
 // Scholarship Type routes
 router.post('/types', isLogin, validate(scholarshipTypeSchema), scholarshipController.createScholarshipType);
