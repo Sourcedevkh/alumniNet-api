@@ -95,6 +95,7 @@ CREATE TABLE classes (
 CREATE TABLE students (
     id INT AUTO_INCREMENT PRIMARY KEY,
     fullname VARCHAR(255) NOT NULL,
+    email VARCHAR(255) NOT NULL UNIQUE,
     gender TINYINT NOT NULL DEFAULT 0 COMMENT '0=Male, 1=Female',
     profile_url VARCHAR(500) NULL,
     cloudinary_id VARCHAR(225) NULL,
@@ -144,6 +145,7 @@ CREATE TABLE grades (
 CREATE TABLE certificates (
     id INT AUTO_INCREMENT PRIMARY KEY,
     student_id INT NOT NULL,
+    qr_token VARCHAR(255) NOT NULL UNIQUE,
     issued_at DATETIME NULL,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
@@ -160,6 +162,7 @@ CREATE TABLE users (
     cloudinary_id VARCHAR(225) NULL,
     token TEXT,
     reset_token VARCHAR(100) NULL,
+    reset_token_expires DATETIME NULL,
     phone VARCHAR(20),
     address TEXT,
     role TINYINT NOT NULL DEFAULT 1 COMMENT '0: super_admin, 1: admin',

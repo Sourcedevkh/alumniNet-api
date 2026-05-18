@@ -5,6 +5,9 @@ const ClassesController = require('../../controllers/admin/classesController');
 const { isLogin } = require('../../middlewares/auth');
 const validate = require('../../middlewares/validate');
 const { classSchema, statusSchema } = require('../../validators/classes');
+const { authLimiter } = require('../../middlewares/rateLimiter');
+
+router.use(authLimiter); 
 
 router.post('/create', isLogin, validate(classSchema), ClassesController.createClasses);
 router.get('/getAll', isLogin, ClassesController.getAll);

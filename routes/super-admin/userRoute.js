@@ -3,11 +3,15 @@ const router = express.Router();
 
 const SuperAdminController = require('../../controllers/super-admin/authController');
 const validate = require('../../middlewares/validate');
-const { createUserSchema, resetAdminSchema } = require('../../validators/user')
+const { createUserSchema, resetAdminSchema, emailSchema } = require('../../validators/user')
+const { authLimiter } = require('../../middlewares/rateLimiter');
+
+router.use(authLimiter); 
 
 router.post('/register', validate(createUserSchema), SuperAdminController.register);
 router.put('/admin-status/:id', SuperAdminController.changeStatus);
-router.put('/resetAdmin-pwd/:id', validate(resetAdminSchema), SuperAdminController.resetAdminPassword);
+router.post('/forgot-password', validate(emailSchema), SuperAdminController.forgotPassword);
+router.post('/reset-password', validate(resetAdminSchema), SuperAdminController.verifyAndResetPassword);
 router.post('/unlock-acc', SuperAdminController.unlockAccount);
 
 module.exports = router;

@@ -6,6 +6,9 @@ const generationController = require("../../controllers/admin/generationControll
 const { isLogin } = require("../../middlewares/auth");
 const validate = require('../../middlewares/validate');
 const { generationSchema } = require("../../validators/generation");
+const { authLimiter } = require('../../middlewares/rateLimiter');
+
+router.use(authLimiter); 
 
 router.get('/', isLogin, generationController.getAllGenerations);
 router.post("/",isLogin,  validate(generationSchema),generationController.createGeneration,);

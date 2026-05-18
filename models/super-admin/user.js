@@ -21,9 +21,20 @@ const updateStatus = async (id, status) => {
     return result.affectedRows;
 } 
 
-const updatePassword = async(id, hashedPassword) => {
-    let [result] = await pool.query('UPDATE users SET password = ?, updated_at = NOW() WHERE id = ?', [hashedPassword, id]);
-    return result.affectedRows;
+const saveResetToken = async (id, hashedToken, expires) => {
+    const [result] = await pool.query('UPDATE users SET reset_token = ?, reset_token_expires = ? WHERE id = ?', [hashedToken, expires, id]);
+    return result.affectedRows > 0;
+}
+
+const findUserByToken = async (hashToken) => {
+    const [rows] = await pool.query('SELECT id, email FROM users WHERE reset_token = ? AND reset_token_expires > NOW()', [hashToken]);
+    return rows;
+}
+
+const updatePasswordAndClearToken = async (id, hashPWD) => {
+    const [resilt] = await pool.query('UPDATE users SET password = ?, reset_token = NULL, reset_token_expires = NULL, updated_at = NOW() WHERE id = ?', [hashPWD, id]);
+    return resilt.affectedRows > 0;
+
 }
 
 module.exports = {
@@ -31,5 +42,7 @@ module.exports = {
     findByEmail,
     findById,
     updateStatus,
-    updatePassword
+    saveResetToken,
+    findUserByToken,
+    updatePasswordAndClearToken,
 }
