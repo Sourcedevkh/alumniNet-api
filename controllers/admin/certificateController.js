@@ -1,6 +1,4 @@
 const certificateService = require('../../services/admin/certificateService');
-const { sendResponse } = require('../../utils/responseHelper');
-const getCertificateSuccessHtml = require('../../utils/certificateSuccessHtml');
 
 const downloadCerti = async (req, res) => {
     try {
