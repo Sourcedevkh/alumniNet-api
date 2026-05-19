@@ -9,7 +9,7 @@ const createStudent = async (req, res) => {
     return sendResponse(res, 200, true, "Create student succeeded", result);
   } catch (error) {
     
-    return sendResponse(res, error.statusCode || 500, false, error.message, null, error.data);
+    return sendResponse(res, 500, false, error.message, null, error.data);
   }
 };
 
@@ -21,7 +21,7 @@ const updateStudentInfo = async (req, res) => {
 
     return sendResponse(res, 200, true, "Update student info succeeded", result);
   } catch (error) {
-    return sendResponse(res, error.statusCode || 500, false, error.message, null, error.data);
+    return sendResponse(res, 500, false, error.message, null, error.data);
   }
 };
 
@@ -32,7 +32,7 @@ const updateStudentProfile = async (req, res) => {
 
     return sendResponse(res, 200, true, "Update student profile succeeded", result);
   } catch (error) {
-    return sendResponse(res, error.statusCode || 500, false, error.message, null, error.data);
+    return sendResponse(res, 500, false, error.message, null, error.data);
   }
 };
 
@@ -43,7 +43,7 @@ const deleteStudent = async (req, res) => {
 
     return sendResponse(res, 200, true, "Student deleted successfully", null);
   } catch (error) {
-    return sendResponse(res, error.statusCode || 500, false, error.message, null, error.data);
+    return sendResponse(res,  500, false, error.message, null, error.data);
   }
 };
 
@@ -52,7 +52,7 @@ const getAllStudents = async (req, res) => {
     const result = await studentService.getAllStudents(req.query);
     return sendResponse(res, 200, true, "Get all students succeeded", result);
   } catch (error) {
-    return sendResponse(res, error.statusCode || 500, false, error.message, null, error.data);
+    return sendResponse(res, 500, false, error.message, null, error.data);
   }
 };
 
@@ -62,7 +62,7 @@ const getStudentById = async (req, res) => {
     const result = await studentService.getStudentById(id);
     return sendResponse(res, 200, true, "Get student by ID succeeded", result);
   } catch (error) {
-    return sendResponse(res, error.statusCode || 500, false, error.message, null, error.data);
+    return sendResponse(res, 500, false, error.message, null, error.data);
   }
 };
 
@@ -72,7 +72,7 @@ const addStudentToClass = async (req, res) => {
     const result = await studentService.addStudentToClass(req.body);
     return sendResponse(res, 200, true, "Student added successfully", result);
   } catch (error) {
-    return sendResponse(res, error.statusCode || 500, false, error.message, null, error.data);
+    return sendResponse(res, 500, false, error.message, null, error.data);
   }
 };
 
@@ -83,7 +83,7 @@ const removeStudentFromClass = async (req, res) => {
     await studentService.removeStudentFromClass(classId, studentId);
     return sendResponse(res, 200, true, "Student removed from class successfully", null);
   } catch (error) {
-    return sendResponse(res, error.statusCode || 500, false, error.message, null, error.data);
+    return sendResponse(res, 500, false, error.message, null, error.data);
   }
 };
 
@@ -94,7 +94,7 @@ const getStudentsByClassId = async (req, res) => {
     const result = await studentService.getStudentsByClassId(classId, queryParams);
     return sendResponse(res, 200, true, "Get students by class ID succeeded", result);
   } catch (error) {
-    return sendResponse(res, error.statusCode || 500, false, error.message, null, error.data);
+    return sendResponse(res, 500, false, error.message, null, error.data);
   }
 };
 
@@ -105,7 +105,7 @@ const getClassesByStudentId = async (req, res) => {
     const result = await studentService.getClassesByStudentId(studentId, queryParams);
     return sendResponse(res, 200, true, "Get classes by student ID succeeded", result);
   } catch (error) {
-    return sendResponse(res, error.statusCode || 500, false, error.message, null, error.data);
+    return sendResponse(res, 500, false, error.message, null, error.data);
   }
 };
 
