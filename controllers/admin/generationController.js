@@ -9,7 +9,6 @@ const getAllGenerations = async (req, res) => {
   }catch(error){
     return sendResponse(res, 500, false, error.message);
   }
-  
 };
 
 const createGeneration = async (req, res) => {
@@ -19,42 +18,32 @@ const createGeneration = async (req, res) => {
     
     sendResponse(res, 201, true, "Generation created successfully", result);
   } catch (error) {
-    
-    const statusCode = error.status || 500;
-    return sendResponse(res, statusCode, false, error.message);
+    return sendResponse(res, 500, false, error.message);
   }
 };
 
 const findGenerationByid = async (req, res) => {
   try {
     const { id } = req.params;
-
     const result = await generationService.findGenerationByid(id);
 
     return sendResponse(res, 200, true, "Generation retrieved successfully", result);
   } catch (error) {
-    if (error.message === "Generation not found") {
+    if (error) {
       return sendResponse(res, 404, false, error.message);
     }
-
     return sendResponse(res, 500, false, error.message);
   }
 };
 
-
-
 const updateGeneration = async (req, res) => {
   try {
     const { id } = req.params;
-    const body = req.body;
+    const body = req.validateBody;
     const result = await generationService.updateGeneration(id, body);
 
     return sendResponse(res, 200, true, "Generation updated successfully", result);
   } catch (error) {
-    if (error.message === "Generation not found") {
-      return sendResponse(res, 404, false, error.message);
-    }
-
     return sendResponse(res, 500, false, error.message);
   }
 };
