@@ -1,9 +1,5 @@
-const dbConfig = require('../../config/db');
 const certificate = require('../../models/admin/certificate');
-const { v4: uuidv4 } = require('uuid');
-const generateQRCode = require('../../utils/qrcode');
 const generateCertificatePDF = require('../../utils/pdf');
-const { sendCertificateEmail } = require('../../utils/emailService');
 
 const getCertiByStudentId = async (studentId) => {
     const certData = await  certificate.getCertiDataByStudentId(studentId);
