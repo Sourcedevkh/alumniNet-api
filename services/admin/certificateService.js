@@ -5,58 +5,26 @@ const generateQRCode = require('../../utils/qrcode');
 const generateCertificatePDF = require('../../utils/pdf');
 const { sendCertificateEmail } = require('../../utils/emailService');
 
-const issueCertificate = async (studentId) => {
-    const qrToken = uuidv4();
-
-    await certificate.create(studentId, qrToken);
-    const verificationUrl = `${dbConfig.appUrl}/api/certificates/verify?token=${qrToken}`;
-    const qrCodeDataUrl = await generateQRCode(verificationUrl);
-
-    return {
-        qrToken,
-        verificationUrl,
-        qrCodeDataUrl
-    };
-
-}
-
-const processScanAndGetBinary = async (token) => {
-    const certData = await certificate.findByToken(token);
-    if (!certData) {
-        throw new Error('Certificate validity check failed: Invalid token');
+const getCertiByStudentId = async (studentId) => {
+    const certData = await  certificate.getCertiDataByStudentId(studentId);
+    if(!certData){
+        throw  new Error('Student data not found');
     }
-    if (!certData.email) {
-        throw new Error('Student email not found for this certificate');
-    }
+
     const pdfStream = generateCertificatePDF(certData);
-
-    const chunks = []; // Collect PDF data chunks
     const pdfBuffer = await new Promise((resolve, reject) => {
+        const chunks = [];
         pdfStream.on('data', chunk => chunks.push(chunk));
         pdfStream.on('end', () => resolve(Buffer.concat(chunks)));
         pdfStream.on('error', err => reject(err));
     });
 
-    const verificationUrl = `${dbConfig.appUrl}/api/certificates/verify?token=${token}`;
-    try {
-        await sendCertificateEmail(
-            certData.email,
-            certData.fullname,
-            pdfBuffer,
-            verificationUrl,
-        );
-    } catch (error) {
-        console.error(`mail delivery failed: ${certData.email}`, error);
-        throw new Error('Certificate generated, but email delivery failed');
-    }
-
     return {
-        filename: `Certificate_${certData.fullname.replace(/\s+/g, '_')}.pdf`,
-        pdfBuffer
+        pdfBuffer,
+        fullname: certData.fullname,
     }
 }
 
 module.exports = {
-    issueCertificate,
-    processScanAndGetBinary
+    getCertiByStudentId
 };
