@@ -1,30 +1,33 @@
 const certificateService = require('../../services/admin/certificateService');
-const { sendResponse } = require('../../utils/responseHelper');
-const getCertificateSuccessHtml = require('../../utils/certificateSuccessHtml');
 
-
-const generateAdminQR = async (req, res) => {
+const downloadCerti = async (req, res) => {
     try {
-        const {student_id} = req.body;
-        const registrationResult = await certificateService.issueCertificate(student_id);
-        return sendResponse(res, 200, true, 'Certificate issued successed', registrationResult);
-    } catch (error) {
-        sendResponse(res, 400, false, error.message);
-    }
-}
+        const { studentId } = req.params;
+        const { pdfBuffer, fullname } = await certificateService.getCertiByStudentId(studentId);
 
-const handleCertificateScan = async (req, res) => {
-    try {
-        const {token} = req.query;
-        await certificateService.processScanAndGetBinary(token);
-        res.setHeader('Content-Type', 'text/html');
-        res.send(getCertificateSuccessHtml());
+        // Create a safe, spaces-removed filename
+        const safeFilename = `Certificate_${fullname.replace(/\s+/g, '_')}.pdf`;
+
+        // HTTP Headers to trigger an instant browser download
+        res.setHeader('Content-Type', 'application/pdf');
+        res.setHeader('Content-Disposition', `attachment; filename="${safeFilename}"`);
+        res.setHeader('Content-Length', pdfBuffer.length);
+        return res.send(pdfBuffer);
+
     } catch (error) {
-        return sendResponse(res, 400, false, error.message);
+        console.error('Error in downloadCerti controller:', error);
+
+        if (!res.headersSent) {
+            const isDataMissing = error.message.includes('not found');
+
+            return res.status(isDataMissing ? 404 : 500).json({
+                success: false,
+                message: error.message || 'Internal processing error occurred'
+            });
+        }
     }
-}
+};
 
 module.exports = {
-    generateAdminQR,
-    handleCertificateScan
+    downloadCerti
 };

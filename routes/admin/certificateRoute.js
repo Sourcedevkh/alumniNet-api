@@ -5,10 +5,10 @@ const certificateController = require('../../controllers/admin/certificateContro
 const { isLogin } = require('../../middlewares/auth');
 const validate = require('../../middlewares/validate');
 const { certificateSchema } = require('../../validators/certificate');
-const { authLimiter } = require('../../middlewares/rateLimiter');
+// const { authLimiter } = require('../../middlewares/rateLimiter');
 
-router.use(authLimiter);
+// router.use(authLimiter);
 
-router.post('/certificates/generate-qrcode', certificateController.generateAdminQR);
+router.post('/certificate/download/:studentId', certificateController.downloadCerti);
 
 module.exports = router;

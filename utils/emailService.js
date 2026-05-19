@@ -239,62 +239,9 @@ const sendPasswordResetSuccessEmail = async (to) => {
   });
 };
 
-// email send certificate
-const sendCertificateEmail = async (to, studentName, pdfBuffer) => {
-  await transporter.sendMail({
-    from: `AlumniNet <noreply@alumninet.com>`,
-    to: to,
-    subject: `Congratulations ${studentName}! Your Official Certificate has arrived.`,
-    html: `
-    <!DOCTYPE html>
-    <html>
-    <head>
-      <style>
-        .container {
-          font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-          line-height: 1.6;
-          color: #333;
-          max-width: 600px;
-          margin: 0 auto;
-          padding: 20px;
-          border: 1px solid #e1e1e1;
-          border-radius: 10px;
-        }
-        .header { text-align: center; padding-bottom: 20px; color: #4F46E5; }
-        .footer { font-size: 12px; color: #888; text-align: center; margin-top: 30px; }
-      </style>
-    </head>
-    <body>
-      <div class="container">
-        <div class="header">
-          <h2>Congratulations, ${studentName}! 🎉</h2>
-        </div>
-        <p>Hi there,</p>
-        <p>We are incredibly proud to deliver your official graduation certificate. Your hard work, dedication, and achievements have brought you to this milestone!</p>
-        
-        <p>Your official printable PDF certificate is safely and securely attached to the bottom of this email layout for you to download, keep, and print at your convenience.</p>
-        
-        <div class="footer">
-          <p>&copy; ${new Date().getFullYear()} AlumniNet Inc. All rights reserved.</p>
-        </div>
-      </div>
-    </body>
-    </html>
-    `,
-    attachments: [
-      {
-        filename: `Certificate_${studentName.replace(/\s+/g, '_')}.pdf`,
-        content: pdfBuffer,
-        contentType: 'application/pdf'
-      }
-    ]
-  });
-};
-
 module.exports = {
   sendVerificationEmail,
   sendOTPEmail,
   sendResetLinkEmail,
-  sendPasswordResetSuccessEmail,
-  sendCertificateEmail
+  sendPasswordResetSuccessEmail
 };
