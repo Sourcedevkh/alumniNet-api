@@ -145,9 +145,9 @@ function drawContent(doc, certData) {
     drawCertificateLogos(doc, centerX, logoPaths);
 
     doc.font('Times-Bold')
-        .fontSize(58)
+        .fontSize(45)
         .fillColor(COLORS.black)
-        .text('CERTIFICATE', 0, 100, {
+        .text('CERTIFICATE', 0, 110, {
             align: 'center',
         });
 
@@ -273,39 +273,47 @@ function drawMedal(doc, cx, cy, size, grade) {
 }
 
 function drawCertificateLogos(doc, centerX, logoPaths) {
-    const defaultLogoWidth = 90;
-    const largerLogoWidth = 180;
-    const gap = 40;
-    const widths = logoPaths.map((logoPath) => {
-        const basename = path.basename(logoPath).toLowerCase();
-        if (basename === 'logo_mptc.png') {
-            return largerLogoWidth;
-        }
-        return defaultLogoWidth;
-    });
-    const totalWidth = widths.reduce((sum, width) => sum + width, 0) + gap * (logoPaths.length - 1);
-    let x = centerX - totalWidth / 2;
-    const y = 20;
+    const leftLogoName = 'ant logo hd.png';
+    const rightLogoName = 'cbrd fund logo final.png';
+    const mptcLogoName = 'logo_mptc.png';
 
-    for (let i = 0; i < logoPaths.length; i++) {
-        const logoPath = logoPaths[i];
-        const logoWidth = widths[i];
+    const leftLogoPath = logoPaths.find((logoPath) => path.basename(logoPath).toLowerCase() === leftLogoName);
+    const rightLogoPath = logoPaths.find((logoPath) => path.basename(logoPath).toLowerCase() === rightLogoName);
+    const mptcLogoPath = logoPaths.find((logoPath) => path.basename(logoPath).toLowerCase() === mptcLogoName);
 
-        if (!fs.existsSync(logoPath)) {
-            x += logoWidth + gap;
-            continue;
-        }
+    const leftWidth = 120;
+    const rightWidth = 120;
+    const mptcWidth = 240;
+    const gap = 30;
+    const y = 35;
+    const leftX = 60;
 
+    if (leftLogoPath && fs.existsSync(leftLogoPath)) {
         try {
-            doc.image(logoPath, x, y, {
-                width: logoWidth,
-            });
+            doc.image(leftLogoPath, leftX, y, { width: leftWidth });
         } catch (error) {
-            x += logoWidth + gap;
-            continue;
+            // ignore invalid left logo
         }
+    }
 
-        x += logoWidth + gap;
+    let x = W - 70;
+    if (mptcLogoPath && fs.existsSync(mptcLogoPath)) {
+        try {
+            x -= mptcWidth;
+            doc.image(mptcLogoPath, x, y, { width: mptcWidth });
+            x -= gap;
+        } catch (error) {
+            x -= mptcWidth + gap;
+        }
+    }
+
+    if (rightLogoPath && fs.existsSync(rightLogoPath)) {
+        try {
+            x -= rightWidth;
+            doc.image(rightLogoPath, x, y, { width: rightWidth });
+        } catch (error) {
+            // ignore invalid right logo
+        }
     }
 }
 
