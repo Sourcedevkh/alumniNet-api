@@ -6,6 +6,7 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "start": "nodemon app.js",
+    "build": "tsc",
     "db:reset": "mysql -u root -p -e \"DROP DATABASE IF EXISTS AlumniNet; CREATE DATABASE AlumniNet;\" && mysql -u root -p AlumniNet < ./database/schema.sql",
     "sync": "git checkout dev && git pull origin dev && npm install && npm run db:reset",
     "migrate": "mysql -u root -p AlumniNet < ./database/migration.sql"
@@ -28,11 +29,14 @@
     "crypto": "^1.0.1",
     "dotenv": "^17.4.2",
     "express": "^5.2.1",
+    "express-rate-limit": "^8.5.2",
     "joi": "^18.1.2",
     "jsonwebtoken": "^9.0.3",
     "multer": "^2.1.1",
     "multer-storage-cloudinary": "^4.0.0",
     "mysql2": "^3.22.3",
-    "nodemailer": "^8.0.7"
+    "nodemailer": "^8.0.7",
+    "pdfkit": "^0.18.0",
+    "ua-parser-js": "^2.0.9"
   }
 }

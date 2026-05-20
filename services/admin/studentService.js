@@ -74,7 +74,6 @@ const updateStudentInfo = async (id, body) => {
   }
 
   const [student] = existingStudent;
-  // Check duplicate phone
   if (phone && phone.trim() !== student.phone) {
     const phoneExists = await studentModel.checkPhone(phone.trim());
     if (phoneExists && phoneExists.length > 0) {
@@ -89,7 +88,6 @@ const updateStudentInfo = async (id, body) => {
     }
   }
 
-  // Validate foreign keys
   const [genData, shiftData, scholarData] = await Promise.all([
     studentModel.findById(generation_id, "generations"),
     studentModel.findById(shift_id, "shifts"),

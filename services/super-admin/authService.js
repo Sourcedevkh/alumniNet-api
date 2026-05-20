@@ -3,6 +3,9 @@ const jwt = require('jsonwebtoken');
 const crypto = require('crypto');
 const User = require('../../models/super-admin/user');
 const emailService = require('../../utils/emailService');
+const Attempt = require('../../models/admin/attempt');
+const { generateRandomToken, hashToken } = require('../../utils/generateToken');
+const {sendResetLinkEmail, sendPasswordResetSuccessEmail} = require('../../utils/emailService');
 
 const create = async (body) => {
     let {fullname, email, password} = body;
@@ -41,20 +44,50 @@ const adminStatus = async (id, status) => {
     return updatedRow[0];
 }
 
-const resetAdminPassword = async (id, newPassword) =>{
-    const adminRows = await User.findById(id);
-    if(adminRows.length === 0){
-        throw new Error('Admin account not found');        
+const requestPasswordReset = async (email) => {
+    const users = await User.findByEmail(email);
+    if(users.length === 0){
+        throw new Error('Admin account not found');
+    }
+    
+    const plainText = generateRandomToken();
+    const hashedToken = hashToken(plainText);
+
+    const expires = new Date(Date.now() + 15 * 60 * 1000); // 15 minutes
+    await User.saveResetToken(users[0].id, hashedToken, expires);
+
+    await sendResetLinkEmail(users[0].email, plainText);
+    return {success: true, message: 'Password reset link has been sent to your email'};
+}
+
+const verifyAndResetPassword = async (plainToken, newPassword) => {
+    const hashedToken = hashToken(plainToken);
+    const userRows = await User.findUserByToken(hashedToken);
+    if(userRows.length === 0){
+        throw new Error('Invalid or expired reset token');
+    }
+    
+    const user = userRows[0];
+    const hashedPWD = await bycrypt.hash(newPassword, 10);
+    await User.updatePasswordAndClearToken(user.id, hashedPWD);
+    await sendPasswordResetSuccessEmail(user.email);
+    return {success: true, message: 'Password has been reset successed'};
+}
+
+const unlockAccount = async (email) => {
+    const rows = await Attempt.isPermanentlyBlocked(email);
+
+    if (rows.length === 0) {
+        throw new Error(`No permanently blocked account found for ${email}`);
     }
 
-    const hashedPWD = await bycrypt.hash(newPassword, 10);
-    await User.updatePassword(id, hashedPWD);
-
-    return {id: id, email: adminRows[0].email};
-}
+    await Attempt.unlockAccount(email);
+};
 
 module.exports = {
     create,
     adminStatus,
-    resetAdminPassword
+    requestPasswordReset,
+    verifyAndResetPassword,
+    unlockAccount
 }

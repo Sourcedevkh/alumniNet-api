@@ -54,6 +54,16 @@ CREATE TABLE scholarships (
     FOREIGN KEY (track_id) REFERENCES scholarship_tracks(id)
 );
 
+CREATE TABLE scholarship_subjects (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    scholarship_id INT NOT NULL,
+    subject_id INT NOT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (scholarship_id) REFERENCES scholarships(id) ON DELETE CASCADE,
+    FOREIGN KEY (subject_id) REFERENCES subjects(id),
+    UNIQUE KEY unique_scholarship_subject (scholarship_id, subject_id)
+);
+
 CREATE TABLE generations (
     id INT AUTO_INCREMENT PRIMARY KEY,
     name VARCHAR(255) NOT NULL,
@@ -85,6 +95,7 @@ CREATE TABLE classes (
 CREATE TABLE students (
     id INT AUTO_INCREMENT PRIMARY KEY,
     fullname VARCHAR(255) NOT NULL,
+    email VARCHAR(255) NOT NULL UNIQUE,
     gender TINYINT NOT NULL DEFAULT 0 COMMENT '0=Male, 1=Female',
     profile_url VARCHAR(500) NULL,
     cloudinary_id VARCHAR(225) NULL,
@@ -148,8 +159,9 @@ CREATE TABLE users (
     password VARCHAR(255) NOT NULL,
     profile_url VARCHAR(500) NULL,
     cloudinary_id VARCHAR(225) NULL,
-    token VARCHAR(255),
+    token TEXT,
     reset_token VARCHAR(100) NULL,
+    reset_token_expires DATETIME NULL,
     phone VARCHAR(20),
     address TEXT,
     role TINYINT NOT NULL DEFAULT 1 COMMENT '0: super_admin, 1: admin',
@@ -160,9 +172,44 @@ CREATE TABLE users (
     otp_code VARCHAR(6) DEFAULT NULL,
     otp_expires_at DATETIME DEFAULT NULL,
     last_login_at DATETIME NULL,
+    last_login_ip VARCHAR(45) NULL,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
 );
 
--- ADD COLUMN
-ALTER TABLE students ADD grade_id INT NOT NULL;
+CREATE TABLE user_devices (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    user_id INT NOT NULL,
+    device_id VARCHAR(255) NOT NULL,
+    device_name VARCHAR(100),
+    browser_name VARCHAR(100),
+    user_agent TEXT,
+    last_ip VARCHAR(45),
+    last_login_at DATETIME,
+    is_trusted TINYINT DEFAULT 0,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
+    UNIQUE KEY unique_device (device_id)
+);
+
+CREATE TABLE login_attempts (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    user_id INT NOT NULL,
+    device_id VARCHAR(255) NOT NULL,
+    attempt_count INT DEFAULT 1,
+    blocked_until DATETIME NULL,
+    block_level TINYINT DEFAULT 0 COMMENT '0=none, 1=5min, 2=10min, 3=permanent',
+    last_attempt_at DATETIME,
+    UNIQUE KEY unique_attempt (user_id, device_id),
+    FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
+);
+
+CREATE TABLE user_login_logs (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    user_id INT NOT NULL,
+    ip_address VARCHAR(45),
+    user_agent TEXT,
+    success TINYINT DEFAULT 0,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
+);

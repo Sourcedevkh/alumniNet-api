@@ -72,6 +72,16 @@ const findByResetToken = async (token) => {
     return rows;
 }
 
+const updateLastIP = async (userId, ip) => {
+    const [result] = await pool.query('UPDATE users SET last_login_ip = ?, updated_at = NOW() WHERE id = ?', [ip, userId]);
+    return result;
+}
+
+const userLog = async () => {
+    const [rows] = await pool.query('SELECT id, fullname, email, phone, address, role, is_active, is_verified, last_login_at FROM users');
+    return rows;
+}
+
 module.exports = {
     findByEmail,
     findById,
@@ -87,5 +97,7 @@ module.exports = {
     clearOTP,
     updateLoginTime,
     saveResetToken,
-    findByResetToken
+    findByResetToken,
+    updateLastIP,
+    userLog
 }

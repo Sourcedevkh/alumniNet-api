@@ -20,7 +20,7 @@ const gradeSchema = Joi.object({
         .messages({
             'string.base': 'grade must be a string',
             'string.empty': 'grade cannot be empty',
-            'any.only': 'grade must be A, B, C, D, E or F',
+            'any.only': 'grade must be A, B, C, D, E or F ',
             'any.required': 'grade is required'
         }),
 

@@ -1,48 +1,33 @@
 const certificateService = require('../../services/admin/certificateService');
-const { sendResponse } = require('../../utils/responseHelper');
 
-const createCertificate = async (req, res) => {
+const downloadCerti = async (req, res) => {
     try {
-        let result = await certificateService.createCertificate(req.body);
-        sendResponse(res, 201, true, 'Certificate created successfully', result);
-    }catch (error) {
-        sendResponse(res, 400, false, error.message);
-    }
-}
+        const { studentId } = req.params;
+        const { pdfBuffer, fullname } = await certificateService.getCertiByStudentId(studentId);
 
-const getAllCertificates = async (req, res) => {
-    try {
-        let result = await certificateService.getAllCertificates();
-        sendResponse(res, 200, true, 'Certificates retrieved successfully', result);
-    }catch (error) {
-        sendResponse(res, 400, false, error.message);
-    }
-}
+        // Create a safe, spaces-removed filename
+        const safeFilename = `Certificate_${fullname.replace(/\s+/g, '_')}.pdf`;
 
-const deleteCertificate = async (req, res) => {
-    try {
-        let id = req.params.id;
-        let body = req.body;
-        let result = await certificateService.deleteCertificate(id,body);
-        sendResponse(res, 200, true, 'Delete certificate successfully', result);
-    }catch (error) {
-        sendResponse(res, 400, false, error.message);
-    }
-}
+        // HTTP Headers to trigger an instant browser download
+        res.setHeader('Content-Type', 'application/pdf');
+        res.setHeader('Content-Disposition', `attachment; filename="${safeFilename}"`);
+        res.setHeader('Content-Length', pdfBuffer.length);
+        return res.send(pdfBuffer);
 
-const getCertificateById = async (req, res) => {
-    try {
-        let id = req.params.id;
-        let result = await certificateService.getCertificateById(id);
-        sendResponse(res, 200, true, 'Certificate get by id successfully', [result]);
-    }catch (error) {
-        sendResponse(res, 400, false, error.message);
+    } catch (error) {
+        console.error('Error in downloadCerti controller:', error);
+
+        if (!res.headersSent) {
+            const isDataMissing = error.message.includes('not found');
+
+            return res.status(isDataMissing ? 404 : 500).json({
+                success: false,
+                message: error.message || 'Internal processing error occurred'
+            });
+        }
     }
-}
+};
 
 module.exports = {
-    createCertificate,
-    getAllCertificates,
-    deleteCertificate,
-    getCertificateById
+    downloadCerti
 };

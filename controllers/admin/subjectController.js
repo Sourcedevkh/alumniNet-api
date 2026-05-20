@@ -21,7 +21,7 @@ const getSubjectById = async (req, res) => {
 
 const createSubject = async (req, res) => {
   try {
-    const result = await subjectService.createSubject(req.body);
+    const result = await subjectService.createSubject(req.validateBody);
     return sendResponse(res, 201, true, 'Subject created successfully', result);
   } catch (error) {
     return sendResponse(res, 400, false, error.message);

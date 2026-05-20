@@ -36,11 +36,16 @@ const createSubject = async (body) => {
 
 const updateSubject = async (id, body) => {
   await pool.query(
-    'UPDATE subjects SET name = COALESCE(?, name), description = COALESCE(?, description) WHERE id = ?',
-    [body.name || null, body.description || null, id]
+    'UPDATE subjects SET name = ?, description = ? WHERE id = ?',
+    [body.name, body.description, id]
   );
 
-  return getSubjectById(id);
+  const [rows] = await pool.query(
+    'SELECT id, name, description, created_at, updated_at FROM subjects WHERE id = ?',
+    [id]
+  );
+
+  return rows[0];
 };
 
 const deleteSubject = async (id) => {
