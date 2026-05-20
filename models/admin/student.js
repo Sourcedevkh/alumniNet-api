@@ -3,7 +3,7 @@ const { pool } = require("../../config/db");
 const baseSelectForAddStudent = `
     SELECT 
         cs.id, cs.student_id, s.fullname, s.profile_url, s.gender, s.phone, s.status, cs.class_id, 
-        c.name as class_name, c.description as class_desc,
+        c.name as class_name, c.description as class_desc, gra.grade, gra.gpa,
         gen.id AS generation_id, gen.name AS generation_name, gen.description AS generation_desc,
         sch.id AS scholarship_id, sch.name AS scholarship_name, sch.description AS scholarship_desc, 
         shi.id AS shift_id, shi.name AS shift_name, cs.created_at
@@ -15,7 +15,8 @@ const baseJoinsForAddStudent = `
     LEFT JOIN generations gen ON s.generation_id = gen.id
     LEFT JOIN scholarships sch ON s.scholarship_id = sch.id
     LEFT JOIN shifts shi ON s.shift_id = shi.id
-    JOIN classes c ON cs.class_id = c.id
+    LEFT JOIN classes c ON cs.class_id = c.id
+    LEFT JOIN grades gra ON s.id = gra.student_id
 `;
 
 const baseSelectForCreateStudent = `
@@ -28,6 +29,8 @@ const baseSelectForCreateStudent = `
         s.status,
         s.created_at,
         s.updated_at,
+        gra.grade,
+        gra.gpa,
         
         gen.id AS generation_id, 
         gen.name AS generation_name, 
@@ -46,12 +49,13 @@ const baseSelectForCreateStudent = `
 `;
 
 const baseJoinsForCreateStudent = `
-    FROM students s
+FROM students s
     LEFT JOIN class_students cs ON s.id = cs.student_id
     LEFT JOIN classes cla ON cs.class_id = cla.id
     LEFT JOIN generations gen ON s.generation_id = gen.id
     LEFT JOIN scholarships sch ON s.scholarship_id = sch.id
     LEFT JOIN shifts shi ON s.shift_id = shi.id
+    LEFT JOIN grades gra ON s.id = gra.student_id
 `;
 
 const findById = async (id, db) => {
