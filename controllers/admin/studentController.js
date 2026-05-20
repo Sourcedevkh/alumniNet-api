@@ -105,7 +105,7 @@ const getClassesByStudentId = async (req, res) => {
     const result = await studentService.getClassesByStudentId(studentId, queryParams);
     return sendResponse(res, 200, true, "Get classes by student ID succeeded", result);
   } catch (error) {
-    return sendResponse(res, 500, false, error.message, null, error.data);
+    return sendResponse(res, error.statusCode || 500, false, error.message);
   }
 };
 

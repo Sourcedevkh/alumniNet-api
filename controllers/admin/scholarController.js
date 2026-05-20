@@ -144,7 +144,7 @@ const getScholarship = async (req, res) => {
 
 const createScholarship = async (req, res) => {
     try {
-        let result = await scholarService.createScholarshipWithSubjects(req.body);
+        let result = await scholarService.createScholarshipWithSubjects(req.validateBody);
         return sendResponse(res, 201, true, 'Scholarship created successfully', result);
     } catch (error) {
         return sendResponse(res, 400, false, error.message);
@@ -154,7 +154,7 @@ const createScholarship = async (req, res) => {
 const updateScholarship = async (req, res) => {
     try {
         let id = req.params.id;
-        let result = await scholarService.updateScholarshipWithSubjects(id, req.body);
+        let result = await scholarService.updateScholarshipWithSubjects(id, req.validateBody);
         return sendResponse(res, 200, true, 'Scholarship updated successfully', result);
     } catch (error) {
         return sendResponse(res, 400, false, error.message);
