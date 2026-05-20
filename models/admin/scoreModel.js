@@ -119,42 +119,6 @@ const getScoresBySubjectId = async (subject_id) => {
   return rows;
 };
 
-// const getClassScoreForm = async (class_id) => {
-//   const [students] = await pool.query(
-//     `
-//     SELECT 
-//       c.id AS class_id,
-//       c.name AS class_name,
-//       st.id AS student_id,
-//       st.fullname
-//     FROM classes c
-//     JOIN students st ON c.id = st.class_id
-//     WHERE c.id = ?
-//     `,
-//     [class_id]
-//   );
-
-//   const [subjects] = await pool.query(`
-//     SELECT id, name
-//     FROM subjects
-//     ORDER BY id ASC
-//   `);
-
-//   return {
-//     class: students.length
-//       ? {
-//           id: students[0].class_id,
-//           name: students[0].class_name,
-//         }
-//       : null,
-//     students: students.map((s) => ({
-//       id: s.student_id,
-//       fullname: s.fullname,
-//     })),
-//     subjects,
-//   };
-// };
-
 module.exports = {
   getAllScores,
   getScoreById,
@@ -165,6 +129,5 @@ module.exports = {
   updateScore,
   deleteScore,
   getStudentAllSubjectsWithScores,
-  getScoresBySubjectId,
-//   getClassScoreForm,
+  getScoresBySubjectId
 };
