@@ -3,7 +3,7 @@ const { sendResponse } = require('../../utils/responseHelper');
 
 const createGrade = async (req, res) => {
     try {
-        let result = await gradeService.createGrade(req.body);
+        let result = await gradeService.createGrade(req.validateBody);
         sendResponse(res, 201, true, 'Grade created successfully', result);
     }catch (error) {
         sendResponse(res, 400, false, error.message);
@@ -23,7 +23,7 @@ const getAllGrades = async (req, res) => {
 const updateGrade = async (req, res) => {
     try {
         let id = req.params.id;
-        let body = req.body;
+        let body = req.validateBody;
         let result = await gradeService.updateGrade(id, body);
         sendResponse(res, 200, true, 'Grade updated successfully', result);    
     }catch (error) {
@@ -34,14 +34,12 @@ const updateGrade = async (req, res) => {
 const deleteGrade = async (req, res) => {
     try {
         let id = req.params.id;
-        let body = req.body;
         let result = await gradeService.deleteGrade(id);
         sendResponse(res, 200, true, 'Grade deleted successfully', result);
     }catch (error) {
         sendResponse(res, 400, false, error.message);
     }
 }
-
 
 const getGradeById = async (req, res) => {
     try {
@@ -52,6 +50,7 @@ const getGradeById = async (req, res) => {
         sendResponse(res, 400, false, error.message);
     }
 }
+
 module.exports = {
     createGrade,
     getAllGrades,

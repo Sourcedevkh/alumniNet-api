@@ -6,7 +6,7 @@ const getAllScores = async (req, res) => {
     const result = await scoreService.getAllScores();
     return sendResponse(res, 200, true, 'Scores retrieved successfully', result);
   } catch (error) {
-    return sendResponse(res, error.statusCode || 400, false, error.message);
+    return sendResponse(res, 400, false, error.message);
   }
 };
 
@@ -15,35 +15,35 @@ const getScoreById = async (req, res) => {
     const result = await scoreService.getScoreById(req.params.id);
     return sendResponse(res, 200, true, 'Score retrieved successfully', result);
   } catch (error) {
-    return sendResponse(res, error.statusCode || 400, false, error.message);
+    return sendResponse(res, 400, false, error.message);
   }
 };
 
 const createScore = async (req, res) => {
   try {
-    const payload = req.validateBody || req.body;
+    const payload = req.validateBody;
     const result = await scoreService.createScore(payload);
     return sendResponse(res, 201, true, 'Score created successfully', result);
   } catch (error) {
-    return sendResponse(res, error.statusCode || 400, false, error.message);
+    return sendResponse(res,  400, false, error.message);
   }
 };
 
 const updateScore = async (req, res) => {
   try {
-    const result = await scoreService.updateScore(req.params.id, req.body);
+    const result = await scoreService.updateScore(req.params.id, req.validateBody);
     return sendResponse(res, 200, true, 'Score updated successfully', result);
   } catch (error) {
-    return sendResponse(res, error.statusCode || 400, false, error.message);
+    return sendResponse(res, 400, false, error.message);
   }
 };
 
 const updateScoresBatch = async (req, res) => {
   try {
-    const result = await scoreService.updateScoresBatch(req.validateBody || req.body);
+    const result = await scoreService.updateScoresBatch(req.validateBody);
     return sendResponse(res, 200, true, 'Scores saved successfully', result);
   } catch (error) {
-    return sendResponse(res, error.statusCode || 400, false, error.message);
+    return sendResponse(res, 400, false, error.message);
   }
 };
 
@@ -52,7 +52,7 @@ const deleteScore = async (req, res) => {
     await scoreService.deleteScore(req.params.id);
     return sendResponse(res, 200, true, 'Score deleted successfully');
   } catch (error) {
-    return sendResponse(res, error.statusCode || 400, false, error.message);
+    return sendResponse(res, 400, false, error.message);
   }
 };
 
@@ -61,7 +61,7 @@ const getStudentScores = async (req, res) => {
     const result = await scoreService.getStudentScores(req.params.student_id);
     return sendResponse(res, 200, true, 'Student scores retrieved successfully', result);
   } catch (error) {
-    return sendResponse(res, error.statusCode || 400, false, error.message);
+    return sendResponse(res, 400, false, error.message);
   }
 };
 
@@ -70,27 +70,9 @@ const getSubjectScores = async (req, res) => {
     const result = await scoreService.getSubjectScores(req.params.subject_id);
     return sendResponse(res, 200, true, 'Subject scores retrieved successfully', result);
   } catch (error) {
-    return sendResponse(res, error.statusCode || 400, false, error.message);
+    return sendResponse(res, 400, false, error.message);
   }
 };
-// const getClassScoreForm = async (req, res) => {
-//   try {
-//     const result = await scoreService.getClassScoreForm(
-//       req.params.class_id
-//     );
-
-//     return res.status(200).json({
-//       success: true,
-//       message: "Class score form retrieved successfully",
-//       data: result,
-//     });
-//   } catch (error) {
-//     return res.status(error.statusCode || 400).json({
-//       success: false,
-//       message: error.message,
-//     });
-//   }
-// };
 
 module.exports = {
   getAllScores,
@@ -101,5 +83,4 @@ module.exports = {
   deleteScore,
   getStudentScores,
   getSubjectScores,
-//   getClassScoreForm,
 };

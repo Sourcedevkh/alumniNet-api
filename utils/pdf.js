@@ -1,53 +1,43 @@
 'use strict';
 
-/**
- * utils/pdf.js
- * Certificate PDF — matches Certi-ai.png design exactly.
- * White background, navy/gold corners, arc watermark top-right,
- * Medal.png badge centre-bottom with grade + GPA overlay.
- *
- * npm install pdfkit
- */
-
 const PDFDocument = require('pdfkit');
-const path        = require('path');
-const fs          = require('fs');
+const path = require('path');
+const fs = require('fs');
 
-// ─── Medal image — place Medal.png in your project root ───────────────────────
 const MEDAL_PATH = path.join(__dirname, '..', 'Medal.png');
+const DEFAULT_LOGO_PATHS = [
+    path.join(__dirname, '..', 'public', 'images', 'ANT logo HD.png'),
+    path.join(__dirname, '..', 'public', 'images', 'CBRD Fund Logo Final.png'),
+    path.join(__dirname, '..', 'public', 'images', 'Logo_MPTC.png'),
+];
 
-// ─── Colour palette (matches Certi-ai.png exactly) ────────────────────────────
-const NAVY       = '#1B3A6B';   // corner triangles, borders
-const GOLD       = '#C8960C';   // corner gold stripe
-const BLUE_TITLE = '#1A56DB';   // "OF ACHIEVEMENT" + student name
-const BLACK      = '#111111';   // "CERTIFICATE" title, org name
-const GREY_BODY  = '#4A4A4A';   // body description text
-const GREY_LABEL = '#888888';   // DATE / SIGNATURE labels
-const DIVIDER    = '#B8CCE8';   // horizontal divider line
-const WATERMARK  = '#C5D5E8';   // arc lines colour
+const COLORS = {
+    navy: '#1E3A8A',
+    gold: '#D4A017',
+    lightGold: '#F5D67B',
+    blue: '#355C9A',
+    black: '#111827',
+    gray: '#6B7280',
+    border: '#C7D2FE',
+    light: '#F8FAFC',
+    watermark: '#CBD5E1',
+};
 
-// ─── A4 Landscape ─────────────────────────────────────────────────────────────
 const W = 841.89;
 const H = 595.28;
 
-// ═══════════════════════════════════════════════════════════════════════════════
-//  MAIN EXPORT
-// ═══════════════════════════════════════════════════════════════════════════════
+
 const generateCertificatePDF = (certData) => {
+
     const doc = new PDFDocument({
-        size   : [W, H],
-        margin : 0,
-        info   : {
-            Title  : `Certificate – ${certData.fullname}`,
-            Author : 'ANT Technology Training Center',
-        },
+        size: [W, H],
+        margin: 0,
     });
 
-    _drawBackground(doc);
-    _drawWatermarkArcs(doc);
-    _drawBorder(doc);
-    _drawCorners(doc);
-    _drawContent(doc, certData);
+    drawBackground(doc);
+    drawDecorations(doc);
+    drawBorders(doc);
+    drawContent(doc, certData);
 
     doc.end();
     return doc;
@@ -55,227 +45,367 @@ const generateCertificatePDF = (certData) => {
 
 module.exports = generateCertificatePDF;
 
-// ═══════════════════════════════════════════════════════════════════════════════
-//  BACKGROUND
-// ═══════════════════════════════════════════════════════════════════════════════
-function _drawBackground(doc) {
-    // White base
-    doc.rect(0, 0, W, H).fill('#FFFFFF');
+function drawBackground(doc) {
 
-    // Very subtle light blue tint in top-right area (matches the original)
-    doc.save().fillOpacity(0.04);
-    doc.rect(W / 2, 0, W / 2, H / 2).fill('#BDD0F0');
+    doc.rect(0, 0, W, H)
+        .fill('#FFFFFF');
+
+    doc.save();
+    doc.fillOpacity(0.03);
+
+    doc.polygon(
+        [W * 0.5, 0],
+        [W, 0],
+        [W, H * 0.5]
+    ).fill(COLORS.blue);
+
     doc.restore();
 }
 
-// ─── Curved arc watermark lines — top-right corner ────────────────────────────
-function _drawWatermarkArcs(doc) {
-    // The arcs fan out from near the top-right corner, matching Certi-ai.png
-    doc.save().strokeOpacity(0.18);
-    const originX = W + 20;
-    const originY = -20;
-    for (let r = 160; r <= 520; r += 30) {
-        doc.circle(originX, originY, r)
-           .lineWidth(0.7)
-           .strokeColor(WATERMARK)
-           .stroke();
+function drawDecorations(doc) {
+
+
+    doc.polygon(
+        [0, 0],
+        [120, 0],
+        [0, 120]
+    ).fill(COLORS.navy);
+
+    doc.polygon(
+        [92, 0],
+        [104, 0],
+        [0, 104],
+        [0, 92]
+    ).fill(COLORS.gold);
+
+
+    doc.polygon(
+        [W, H],
+        [W - 120, H],
+        [W, H - 120]
+    ).fill(COLORS.navy);
+
+    doc.polygon(
+        [W - 92, H],
+        [W - 104, H],
+        [W, H - 104],
+        [W, H - 92]
+    ).fill(COLORS.gold);
+
+    doc.save();
+    doc.strokeOpacity(0.15);
+
+    for (let i = 180; i <= 520; i += 25) {
+
+        doc.circle(W + 20, -20, i)
+            .lineWidth(0.7)
+            .strokeColor(COLORS.watermark)
+            .stroke();
     }
+
     doc.restore();
 
-    // Bottom-left faint arcs (subtle, matching original)
-    doc.save().strokeOpacity(0.1);
-    for (let r = 120; r <= 340; r += 30) {
-        doc.circle(-20, H + 20, r)
-           .lineWidth(0.5)
-           .strokeColor(WATERMARK)
-           .stroke();
+    doc.save();
+    doc.strokeOpacity(0.08);
+
+    for (let i = 100; i <= 320; i += 25) {
+
+        doc.circle(-20, H + 20, i)
+            .lineWidth(0.5)
+            .strokeColor(COLORS.watermark)
+            .stroke();
     }
+
     doc.restore();
 }
 
-// ─── Double border ────────────────────────────────────────────────────────────
-function _drawBorder(doc) {
-    // Outer navy border
-    doc.rect(16, 16, W - 32, H - 32)
-       .lineWidth(2.5)
-       .strokeColor(NAVY)
-       .stroke();
+function drawBorders(doc) {
 
-    // Inner thin blue border
-    doc.rect(24, 24, W - 48, H - 48)
-       .lineWidth(0.7)
-       .strokeColor('#7A9FD0')
-       .stroke();
+    doc.rect(18, 18, W - 36, H - 36)
+        .lineWidth(2)
+        .strokeColor(COLORS.border)
+        .stroke();
+
+    doc.rect(28, 28, W - 56, H - 56)
+        .lineWidth(0.7)
+        .strokeColor('#E2E8F0')
+        .stroke();
 }
 
-// ─── Navy triangle corners + gold stripe ─────────────────────────────────────
-function _drawCorners(doc) {
-    const S = 120;   // triangle leg length
-    const G = 22;    // gold stripe thickness
+function drawContent(doc, certData) {
 
-    // ── TOP-LEFT ──────────────────────────────────────────────────────────────
-    // Navy filled triangle
-    doc.polygon([0, 0], [S, 0], [0, S]).fill(NAVY);
-    // Gold diagonal stripe near the hypotenuse
-    doc.polygon([S - G, 0], [S, 0], [0, S], [0, S - G]).fill(GOLD);
+    const centerX = W / 2;
 
-    // ── BOTTOM-RIGHT ──────────────────────────────────────────────────────────
-    doc.polygon([W, H], [W - S, H], [W, H - S]).fill(NAVY);
-    doc.polygon([W - S + G, H], [W - S, H], [W, H - S], [W, H - S + G]).fill(GOLD);
-}
+    const logoPaths = certData.logoPath
+        ? Array.isArray(certData.logoPath)
+            ? certData.logoPath.map((name) => path.join(__dirname, '..', 'public', 'images', name))
+            : [path.join(__dirname, '..', 'public', 'images', certData.logoPath)]
+        : DEFAULT_LOGO_PATHS;
 
-// ═══════════════════════════════════════════════════════════════════════════════
-//  CONTENT
-// ═══════════════════════════════════════════════════════════════════════════════
-function _drawContent(doc, certData) {
-    const TX = 80;            // left padding (avoids corner triangle)
-    const TW = W - 160;       // text width
-    const cx = W / 2;         // horizontal centre
+    drawCertificateLogos(doc, centerX, logoPaths);
 
-    // ── "CERTIFICATE" ─────────────────────────────────────────────────────────
-    // Matches the original: large, bold, serif-style (Helvetica-Bold is closest
-    // available built-in; for a true serif use an embedded font)
-    doc.font('Helvetica-Bold')
-       .fontSize(62)
-       .fillColor(BLACK)
-       .text('CERTIFICATE', TX, 52, { width: TW, align: 'center' });
-
-    // ── "OF ACHIEVEMENT" ──────────────────────────────────────────────────────
-    doc.font('Helvetica')
-       .fontSize(13)
-       .fillColor(BLUE_TITLE)
-       .text('OF ACHIEVEMENT', TX, 128, {
-           width: TW, align: 'center', characterSpacing: 3,
-       });
-
-    // ── Organisation ──────────────────────────────────────────────────────────
-    doc.font('Helvetica-Bold')
-       .fontSize(14)
-       .fillColor(BLACK)
-       .text('ANT Technology Training Center', TX, 162, {
-           width: TW, align: 'center',
-       });
-
-    // ── Student name ──────────────────────────────────────────────────────────
-    doc.font('Helvetica-Bold')
-       .fontSize(38)
-       .fillColor(BLUE_TITLE)
-       .text(certData.fullname || '—', TX, 194, {
-           width: TW, align: 'center',
-       });
-
-    // ── Horizontal divider (matches the original full-width blue line) ─────────
-    const divY = 252;
-    doc.moveTo(cx - 310, divY).lineTo(cx + 310, divY)
-       .lineWidth(0.8).strokeColor(DIVIDER).stroke();
-
-    // ── Body description ───────────────────────────────────────────────────────
-    const shift      = certData.shift_name      || '';
-    const generation = certData.generation_name || '';
-    const years      = (certData.start_year && certData.end_year)
-        ? ` (${certData.start_year} – ${certData.end_year})`
-        : '';
-
-    const body = (shift && generation)
-        ? `For successfully completing the program under the\nSoftware Development framework, attending the ${shift} session for ${generation}${years}.`
-        : 'For successfully completing the program under the\nSoftware Development framework.';
-
-    doc.font('Helvetica')
-       .fontSize(13)
-       .fillColor(GREY_BODY)
-       .text(body, TX, 268, { width: TW, align: 'center', lineGap: 5 });
-
-    // ── Medal image (centre-bottom) ────────────────────────────────────────────
-    const medalSize = 100;
-    const medalY    = 358;
-    _drawMedal(doc, cx, medalY, medalSize, certData.grade || 'A', certData.gpa);
-
-    // ── Date / Signature row ───────────────────────────────────────────────────
-    const rowY  = 460;
-    const colW  = 150;
-    const dateX = cx - 185;
-    const sigX  = cx + 185;
-
-    const issued = certData.issued_at
-        ? new Date(certData.issued_at).toLocaleDateString('en-US', {
-              year: 'numeric', month: 'long', day: 'numeric' })
-        : new Date().toLocaleDateString('en-US', {
-              year: 'numeric', month: 'long', day: 'numeric' });
-
-    // DATE column
-    doc.font('Helvetica-Bold').fontSize(11).fillColor(BLACK)
-       .text(issued, dateX - colW / 2, rowY, { width: colW, align: 'center' });
-    doc.moveTo(dateX - colW / 2, rowY + 18).lineTo(dateX + colW / 2, rowY + 18)
-       .lineWidth(0.7).strokeColor(BLACK).stroke();
-    doc.font('Helvetica').fontSize(8).fillColor(GREY_LABEL)
-       .text('DATE', dateX - colW / 2, rowY + 23, {
-           width: colW, align: 'center', characterSpacing: 2 });
-
-    // SIGNATURE column
-    doc.font('Helvetica-Bold').fontSize(11).fillColor(BLACK)
-       .text('Awarder', sigX - colW / 2, rowY, { width: colW, align: 'center' });
-    doc.moveTo(sigX - colW / 2, rowY + 18).lineTo(sigX + colW / 2, rowY + 18)
-       .lineWidth(0.7).strokeColor(BLACK).stroke();
-    doc.font('Helvetica').fontSize(8).fillColor(GREY_LABEL)
-       .text('SIGNATURE', sigX - colW / 2, rowY + 23, {
-           width: colW, align: 'center', characterSpacing: 2 });
-}
-
-// ═══════════════════════════════════════════════════════════════════════════════
-//  MEDAL
-// ═══════════════════════════════════════════════════════════════════════════════
-function _drawMedal(doc, cx, topY, size, grade, gpa) {
-    const hasGpa = gpa != null && gpa !== '';
-
-    if (fs.existsSync(MEDAL_PATH)) {
-        // ── Render Medal.png centred ───────────────────────────────────────────
-        doc.image(MEDAL_PATH, cx - size / 2, topY, {
-            width  : size,
-            height : size,
+    doc.font('Times-Bold')
+        .fontSize(45)
+        .fillColor(COLORS.black)
+        .text('CERTIFICATE', 0, 110, {
+            align: 'center',
         });
 
-        // ── Grade letter overlaid on medal ─────────────────────────────────────
-        // Position tuned to sit on the gold circle portion of the medal image
-        const gradeY = hasGpa
-            ? topY + size * 0.20
-            : topY + size * 0.28;
+    doc.font('Helvetica')
+        .fontSize(16)
+        .fillColor(COLORS.blue)
+        .text('OF ACHIEVEMENT', 0, 165, {
+            align: 'center',
+            characterSpacing: 4,
+        });
 
-        doc.font('Helvetica-Bold')
-           .fontSize(28)
-           .fillColor('#111111')
-           .text(String(grade), cx - size / 2, gradeY, {
-               width: size, align: 'center',
-           });
+  
+    doc.font('Helvetica-Bold')
+        .fontSize(20)
+        .fillColor(COLORS.black)
+        .text(
+            certData.organization || 'ANT Technology Training Center',
+            0,
+            205,
+            { align: 'center' }
+        );
 
-        // ── GPA below grade ───────────────────────────────────────────────────
-        if (hasGpa) {
-            doc.font('Helvetica-Bold')
-               .fontSize(9)
-               .fillColor('#222222')
-               .text(`GPA: ${gpa}`, cx - size / 2, topY + size * 0.56, {
-                   width: size, align: 'center',
-               });
-        }
-    } else {
-        // ── Fallback: draw badge programmatically ──────────────────────────────
-        const cy = topY + size / 2;
-        const R  = size / 2 - 4;
-        const PTS = 16;
-        const pts = [];
-        for (let i = 0; i < PTS * 2; i++) {
-            const angle = (Math.PI / PTS) * i - Math.PI / 2;
-            const r     = i % 2 === 0 ? R + 14 : R + 4;
-            pts.push([cx + Math.cos(angle) * r, cy + Math.sin(angle) * r]);
-        }
-        doc.polygon(...pts).fill(NAVY);
-        doc.circle(cx, cy, R).fill('#D4A017');
+  
+    doc.font('Helvetica-Bold')
+        .fontSize(36)
+        .fillColor(COLORS.blue)
+        .text(
+            certData.fullname || 'Student Name',
+            0,
+            255,
+            { align: 'center' }
+        );
 
-        const letterY = hasGpa ? cy - R + 5 : cy - 15;
-        doc.font('Helvetica-Bold').fontSize(26).fillColor('#111111')
-           .text(String(grade), cx - R, letterY, { width: R * 2, align: 'center' });
-        if (hasGpa) {
-            doc.font('Helvetica-Bold').fontSize(9).fillColor('#222222')
-               .text(`GPA: ${gpa}`, cx - R, cy + 10, { width: R * 2, align: 'center' });
+
+    doc.moveTo(150, 325)
+        .lineTo(W - 150, 325)
+        .lineWidth(1)
+        .strokeColor('#CBD5E1')
+        .stroke();
+
+    const scholarshipType = certData.scholarship_name ? `${certData.scholarship_name} Scholarship` : 'program';
+
+    doc.font('Helvetica')
+        .fontSize(18)
+        .fillColor(COLORS.gray)
+        .text(`For successfully completing the ${scholarshipType}.`, 120, 350, {
+            align: 'center',
+            width: W - 240,
+            lineGap: 6,
+        });
+
+    const grade = resolveGrade(certData);
+  
+    drawMedal(
+        doc,
+        centerX,
+        455,
+        120,
+        grade
+    );
+
+    drawFooter(doc, certData);
+}
+
+function drawMedal(doc, cx, cy, size, grade) {
+
+    const r = size / 2;
+
+
+    doc.polygon(
+        [cx - 20, cy + 30],
+        [cx - 55, cy + 90],
+        [cx - 10, cy + 80]
+    ).fill(COLORS.navy);
+
+
+    doc.polygon(
+        [cx + 20, cy + 30],
+        [cx + 55, cy + 90],
+        [cx + 10, cy + 80]
+    ).fill(COLORS.navy);
+
+
+    const points = [];
+
+    for (let i = 0; i < 32; i++) {
+
+        const angle = (Math.PI / 16) * i;
+        const radius = i % 2 === 0 ? r : r - 10;
+
+        points.push([
+            cx + Math.cos(angle) * radius,
+            cy + Math.sin(angle) * radius,
+        ]);
+    }
+
+    doc.polygon(...points)
+        .fill(COLORS.navy);
+
+
+    doc.circle(cx, cy, r - 12)
+        .fill(COLORS.gold);
+
+
+    doc.circle(cx, cy, r - 18)
+        .lineWidth(2)
+        .strokeColor(COLORS.lightGold)
+        .stroke();
+
+
+    doc.font('Helvetica-Bold')
+        .fontSize(42)
+        .fillColor(COLORS.black)
+        .text(
+            grade,
+            cx - 30,
+            cy - 15,
+            {
+                width: 60,
+                align: 'center',
+            }
+        );
+}
+
+function drawCertificateLogos(doc, centerX, logoPaths) {
+    const leftLogoName = 'ant logo hd.png';
+    const rightLogoName = 'cbrd fund logo final.png';
+    const mptcLogoName = 'logo_mptc.png';
+
+    const leftLogoPath = logoPaths.find((logoPath) => path.basename(logoPath).toLowerCase() === leftLogoName);
+    const rightLogoPath = logoPaths.find((logoPath) => path.basename(logoPath).toLowerCase() === rightLogoName);
+    const mptcLogoPath = logoPaths.find((logoPath) => path.basename(logoPath).toLowerCase() === mptcLogoName);
+
+    const leftWidth = 120;
+    const rightWidth = 120;
+    const mptcWidth = 240;
+    const gap = 30;
+    const y = 35;
+    const leftX = 60;
+
+    if (leftLogoPath && fs.existsSync(leftLogoPath)) {
+        try {
+            doc.image(leftLogoPath, leftX, y, { width: leftWidth });
+        } catch (error) {
+            // ignore invalid left logo
         }
     }
+
+    let x = W - 70;
+    if (mptcLogoPath && fs.existsSync(mptcLogoPath)) {
+        try {
+            x -= mptcWidth;
+            doc.image(mptcLogoPath, x, y, { width: mptcWidth });
+            x -= gap;
+        } catch (error) {
+            x -= mptcWidth + gap;
+        }
+    }
+
+    if (rightLogoPath && fs.existsSync(rightLogoPath)) {
+        try {
+            x -= rightWidth;
+            doc.image(rightLogoPath, x, y, { width: rightWidth });
+        } catch (error) {
+            // ignore invalid right logo
+        }
+    }
+}
+
+function resolveGrade(certData) {
+    if (certData.grade) {
+        return certData.grade;
+    }
+
+    const gpa = parseFloat(certData.gpa);
+    if (Number.isFinite(gpa)) {
+        if (gpa >= 3.7) return 'A';
+        if (gpa >= 3.0) return 'B';
+        if (gpa >= 2.0) return 'C';
+        if (gpa >= 1.0) return 'D';
+        return 'F';
+    }
+
+    return 'N/A';
+}
+
+function drawGpaBelowMedal(doc, cx, y, gpa) {
+    doc.font('Helvetica')
+        .fontSize(16)
+        .fillColor(COLORS.black)
+        .text(
+            `GPA: ${gpa}`,
+            cx - 60,
+            y,
+            {
+                width: 120,
+                align: 'center',
+            }
+        );
+}
+
+function drawFooter(doc, certData) {
+
+    const date = certData.issued_at
+        ? new Date(certData.issued_at)
+        : new Date();
+
+    const formattedDate = date.toLocaleDateString('en-US', {
+        year: 'numeric',
+        month: 'long',
+        day: 'numeric',
+    });
+
+    doc.font('Helvetica')
+        .fontSize(16)
+        .fillColor(COLORS.black)
+        .text(formattedDate, 130, 510, {
+            width: 180,
+            align: 'center',
+        });
+
+    doc.moveTo(120, 540)
+        .lineTo(330, 540)
+        .lineWidth(1)
+        .strokeColor('#94A3B8')
+        .stroke();
+
+    doc.font('Helvetica')
+        .fontSize(10)
+        .fillColor(COLORS.gray)
+        .text('DATE', 120, 548, {
+            width: 210,
+            align: 'center',
+            characterSpacing: 2,
+        });
+
+    const awarder = certData.awarder || certData.signatory || 'Awarder';
+
+    doc.font('Helvetica')
+        .fontSize(16)
+        .fillColor(COLORS.black)
+        .text(awarder, W - 310, 510, {
+            width: 180,
+            align: 'center',
+        });
+
+    doc.moveTo(W - 330, 540)
+        .lineTo(W - 120, 540)
+        .lineWidth(1)
+        .strokeColor('#94A3B8')
+        .stroke();
+
+    doc.font('Helvetica')
+        .fontSize(10)
+        .fillColor(COLORS.gray)
+        .text('SIGNATURE', W - 330, 548, {
+            width: 210,
+            align: 'center',
+            characterSpacing: 2,
+        });
 }
