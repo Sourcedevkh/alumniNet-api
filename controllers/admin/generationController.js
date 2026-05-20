@@ -29,9 +29,6 @@ const findGenerationByid = async (req, res) => {
 
     return sendResponse(res, 200, true, "Generation retrieved successfully", result);
   } catch (error) {
-    if (error) {
-      return sendResponse(res, 404, false, error.message);
-    }
     return sendResponse(res, 500, false, error.message);
   }
 };
