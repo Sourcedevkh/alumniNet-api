@@ -13,7 +13,7 @@ const getAllGenerations = async (req, res) => {
 
 const createGeneration = async (req, res) => {
   try {
-    const body = req.body;
+    const body = req.validateBody;
     const result = await generationService.createGeneration(body);
     
     sendResponse(res, 201, true, "Generation created successfully", result);
