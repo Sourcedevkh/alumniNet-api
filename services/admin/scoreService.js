@@ -211,5 +211,6 @@ module.exports = {
   updateScoresBatch,
   deleteScore,
   getStudentScores,
+  getSubjectScores,
   getSubjectScores
 };
