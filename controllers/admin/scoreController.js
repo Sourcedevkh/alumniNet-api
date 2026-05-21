@@ -31,10 +31,10 @@ const createScore = async (req, res) => {
 
 const updateScore = async (req, res) => {
   try {
-    const result = await scoreService.updateScore(req.params.id, req.validateBody);
+    const result = await scoreService.updateScore(req.params.id, req.body);
     return sendResponse(res, 200, true, 'Score updated successfully', result);
   } catch (error) {
-    return sendResponse(res, 400, false, error.message);
+    return sendResponse(res, error.statusCode || 400, false, error.message);
   }
 };
 
@@ -78,9 +78,9 @@ module.exports = {
   getAllScores,
   getScoreById,
   createScore,
-  updateScore,
   updateScoresBatch,
   deleteScore,
   getStudentScores,
   getSubjectScores,
+//   getClassScoreForm,
 };
