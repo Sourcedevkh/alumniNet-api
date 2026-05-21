@@ -6,7 +6,7 @@ const validate = require('../../middlewares/validate');
 const {loginUserSchema, resetVerificationLinkSchema, emailSchema, verifyOTPSchema, resetPasswordSchema} = require('../../validators/user')
 const { isLogin } = require('../../middlewares/auth');
 const trackDevice = require('../../middlewares/devicesInfo');
-const { authLimiter } = require('../../middlewares/rateLimiter');
+// const { authLimiter } = require('../../middlewares/rateLimiter');
 
 // router.use(authLimiter); 
 

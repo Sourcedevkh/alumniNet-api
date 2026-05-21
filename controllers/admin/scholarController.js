@@ -3,7 +3,7 @@ const {sendResponse} = require('../../utils/responseHelper');
 
 const createScholarshipType = async (req, res) => {
     try {
-        let arrs = req.body;
+        let arrs = req.validateBody;
         let result = await scholarService.createScholarshipType(arrs);
         return sendResponse(res, 201, true, 'Scholarship type created successfully', result);
     } catch (error) {
@@ -24,8 +24,8 @@ const getScholarshipTypes = async (req, res) => {
 const updateScholarshipType = async (req, res) => {
     try {
         let id = req.params.id;
-        let body = req.body;
-        let [result] = await scholarService.updateScholarshipType(id,body);
+        let body = req.validateBody;
+        let [result] = await scholarService.updateScholarshipType(id, body);
         return sendResponse(res, 200, true, 'Scholarship type updated successfully', result);
     }catch (error) {
         return sendResponse(res, 400, false, error.message);
@@ -44,7 +44,7 @@ const deleteScholarshipType = async (req, res) => {
 
 const createScholarshipSubject = async (req, res) => {
     try {
-        let arrs = req.body;
+        let arrs = req.validateBody;
         let result = await scholarService.createScholarshipSubject(arrs);
         return sendResponse(res, 201, true, 'Scholarship subject created successfully', result);
     }catch (error) {
@@ -64,7 +64,7 @@ const getAllScholarshipSubjects = async (req, res) =>  {
 const updateScholarshipSubject = async (req, res) => {
     try {
         let id = req.params.id;
-        let body = req.body;
+        let body = req.validateBody;
         let result = await scholarService.updateScholarshipSubject(id, body);
         return sendResponse(res, 200, true, 'Scholarship subject updated successfully', result);
     }catch (error) {
@@ -84,7 +84,7 @@ const deleteScholarshipSubject = async (req, res) => {
 
 const createScholarshipTrack = async (req, res) => {
     try {
-        let body = req.body;
+        let body = req.validateBody;
         let result = await scholarService.createScholarshipTrack(body);
         return sendResponse(res, 200, true, 'Scholarship track created successfully', result);
     }catch (error) {
@@ -104,7 +104,7 @@ const getAllScholarshipTracks = async (req, res) => {
 const updateScholarshipTrack = async (req, res) => {
     try {
         let id = req.params.id;
-        let body = req.body;
+        let body = req.validateBody;
         let result = await scholarService.updateScholarshipTrack(id, body);
         return sendResponse(res, 200, true, 'Scholarship track updated successfully', result);
     }catch (error) {
@@ -114,9 +114,8 @@ const updateScholarshipTrack = async (req, res) => {
 
 const deleteScholarshipTrack = async (req, res) => {
     try {
-
         let id = req.params.id;
-        let body = req.body;
+        let body = req.validateBody;
         let result = await scholarService.deleteScholarshipTrack(id, body);
         return sendResponse(res, 200, true, 'Delete scholarship track successfully', result);
     }catch (error) {
@@ -145,7 +144,7 @@ const getScholarship = async (req, res) => {
 
 const createScholarship = async (req, res) => {
     try {
-        let result = await scholarService.createScholarshipWithSubjects(req.body);
+        let result = await scholarService.createScholarshipWithSubjects(req.validateBody);
         return sendResponse(res, 201, true, 'Scholarship created successfully', result);
     } catch (error) {
         return sendResponse(res, 400, false, error.message);
@@ -155,7 +154,7 @@ const createScholarship = async (req, res) => {
 const updateScholarship = async (req, res) => {
     try {
         let id = req.params.id;
-        let result = await scholarService.updateScholarshipWithSubjects(id, req.body);
+        let result = await scholarService.updateScholarshipWithSubjects(id, req.validateBody);
         return sendResponse(res, 200, true, 'Scholarship updated successfully', result);
     } catch (error) {
         return sendResponse(res, 400, false, error.message);

@@ -14,20 +14,17 @@ const getAllGenerations = async () => {
 }
 
 const createGeneration = async (body) => {
-  // 1. Check duplicate 'name' ជាមុនសិន
   const [existing] = await pool.query(
     `SELECT id FROM generations WHERE name = ? LIMIT 1`,
     [body.name]
   );
 
   if (existing.length > 0) {
-    // បោះ Error ប្រាប់ថាឈ្មោះនេះមានរួចហើយ (ជៀសវាង Duplicate)
     const error = new Error("Generation name already exists!");
     error.status = 400; 
     throw error;
   }
 
-  // 2. ប្រសិនបើមិនទាន់មានឈ្មោះហ្នឹងទេ ទើបអនុញ្ញាតឱ្យ INSERT
   const arr = [
     body.name,
     body.description,
@@ -44,7 +41,6 @@ const createGeneration = async (body) => {
     arr,
   );
 
-  // 3. ទាញយកទិន្នន័យដែលទើបតែបញ្ចូលរួចមកបង្ហាញវិញ
   const [rows] = await pool.query(
     `SELECT 
             g.*, 
@@ -61,12 +57,11 @@ const createGeneration = async (body) => {
 };
 
 const checkDuplicateName = async (name) => {
-    // ប្រើ pool.query ដើម្បីឆែកក្នុង database
     const [rows] = await pool.query(
         "SELECT id FROM generations WHERE name = ? LIMIT 1",
         [name]
     );
-    return rows.length > 0; // បើមាន បោះតម្លៃ true បើអត់បោះ false
+    return rows.length > 0; 
 };
 
 const findGenerationByid = async (id) => {
@@ -115,8 +110,6 @@ const updateGeneration = async (id, body) => {
 
   return rows[0];
 };
-
-
 
 const deleteGeneration = async (id) => {
   const [result] = await pool.query(`DELETE FROM generations WHERE id = ?`, [
