@@ -131,6 +131,20 @@ const resetAdminSchema = Joi.object({
         }),
 });
 
+const statusSchema = Joi.object({
+    status: Joi.number()
+        .integer()
+        .valid(0, 1)
+        .required()
+        .messages({
+            'number.base': 'Status must be a number',
+            'number.integer': 'Status must be an integer',
+            'any.only': 'Status must be 0 (disable) or 1 (enable)',
+            'any.required': 'Status is required'
+        })
+})
+
+
 const createStudent = Joi.object({
 
     fullname: Joi.string()
@@ -236,5 +250,6 @@ module.exports = {
     codeOTPSchema,
     verifyOTPSchema,
     resetAdminSchema,
-    createStudent
+    createStudent,
+    statusSchema
 }
