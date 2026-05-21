@@ -176,7 +176,7 @@ const createStudent = Joi.object({
         }),
 
     email: Joi.string()
-        .pattern(/^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/)
+        .pattern(/^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{3,}$/)
         .required()
         .messages({
             'string.base': 'Email must be a string',
@@ -199,7 +199,7 @@ const createStudent = Joi.object({
 
     status: Joi.string()
         .trim()
-        .valid("Graduate", "Studying", "Suspend")
+        .valid("Graduate")
         .empty("")
         .default("Graduate")
         .messages({
