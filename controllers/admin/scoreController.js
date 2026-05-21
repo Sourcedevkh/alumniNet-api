@@ -29,15 +29,6 @@ const createScore = async (req, res) => {
   }
 };
 
-const updateScore = async (req, res) => {
-  try {
-    const result = await scoreService.updateScore(req.params.id, req.body);
-    return sendResponse(res, 200, true, 'Score updated successfully', result);
-  } catch (error) {
-    return sendResponse(res, error.statusCode || 400, false, error.message);
-  }
-};
-
 const updateScoresBatch = async (req, res) => {
   try {
     const result = await scoreService.updateScoresBatch(req.validateBody);

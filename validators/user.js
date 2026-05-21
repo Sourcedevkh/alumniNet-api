@@ -17,7 +17,7 @@ const createUserSchema = Joi.object({
         }),
 
     email: Joi.string()
-        .pattern(/^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/)
+        .pattern(/^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{3,}$/)
         .required()
         .messages({
             'string.base': 'Email must be a string',
@@ -43,7 +43,7 @@ const loginUserSchema = Joi.object({
 
 const emailSchema = Joi.object({
     email: Joi.string()
-        .pattern(/^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/)
+        .pattern(/^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{3,}$/)
         .required()
         .messages({
             'string.base': 'Email must be a string',
@@ -63,7 +63,7 @@ const codeOTPSchema = Joi.object({
 
 const verifyOTPSchema = Joi.object({
     email: Joi.string()
-        .pattern(/^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/)
+        .pattern(/^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{3,}$/)
         .required()
         .messages({
             'string.base': 'Email must be a string',
@@ -80,7 +80,7 @@ const verifyOTPSchema = Joi.object({
 
 const resetVerificationLinkSchema = Joi.object({
     email: Joi.string()
-        .pattern(/^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/)
+        .pattern(/^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{3,}$/)
         .required()
         .messages({
             'string.base': 'Email must be a string',
@@ -175,6 +175,18 @@ const createStudent = Joi.object({
                 "Phone number must contain only digits and be between 7 and 15 numbers"
         }),
 
+    email: Joi.string()
+        .pattern(/^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{3,}$/)
+        .required()
+        .messages({
+            'string.base': 'Email must be a string',
+            'string.empty': 'Email cannot be empty',
+            'string.pattern.base': 'Please provide a valid email address (e.g., name@domain.com)',
+            'any.required': 'Email is required'
+        }),
+        'string.email': 'Please provide a valid email address (e.g., name@domain.com)',
+        'any.required': 'Email is required',
+
     gender: Joi.number()
         .integer()
         .valid(0, 1)
@@ -187,7 +199,7 @@ const createStudent = Joi.object({
 
     status: Joi.string()
         .trim()
-        .valid("Graduate", "Studying", "Suspend")
+        .valid("Graduate")
         .empty("")
         .default("Graduate")
         .messages({

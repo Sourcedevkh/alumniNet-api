@@ -2,8 +2,8 @@ const { pool } = require("../../config/db");
 
 const baseSelectForAddStudent = `
     SELECT 
-        cs.id, cs.student_id, s.fullname, s.profile_url, s.gender, s.phone, s.status, cs.class_id, 
-        c.name as class_name, c.description as class_desc,
+        cs.id, cs.student_id, s.fullname, s.profile_url, s.gender, s.phone, s.email, s.status, cs.class_id, 
+        c.name as class_name, c.description as class_desc, gra.grade, gra.gpa,
         gen.id AS generation_id, gen.name AS generation_name, gen.description AS generation_desc,
         sch.id AS scholarship_id, sch.name AS scholarship_name, sch.description AS scholarship_desc, 
         shi.id AS shift_id, shi.name AS shift_name, cs.created_at
@@ -15,7 +15,8 @@ const baseJoinsForAddStudent = `
     LEFT JOIN generations gen ON s.generation_id = gen.id
     LEFT JOIN scholarships sch ON s.scholarship_id = sch.id
     LEFT JOIN shifts shi ON s.shift_id = shi.id
-    JOIN classes c ON cs.class_id = c.id
+    LEFT JOIN classes c ON cs.class_id = c.id
+    LEFT JOIN grades gra ON s.id = gra.student_id
 `;
 
 const baseSelectForCreateStudent = `
@@ -25,9 +26,12 @@ const baseSelectForCreateStudent = `
         s.profile_url, 
         s.gender, 
         s.phone, 
+        s.email,
         s.status,
         s.created_at,
         s.updated_at,
+        gra.grade,
+        gra.gpa,
         
         gen.id AS generation_id, 
         gen.name AS generation_name, 
@@ -46,12 +50,13 @@ const baseSelectForCreateStudent = `
 `;
 
 const baseJoinsForCreateStudent = `
-    FROM students s
+FROM students s
     LEFT JOIN class_students cs ON s.id = cs.student_id
     LEFT JOIN classes cla ON cs.class_id = cla.id
     LEFT JOIN generations gen ON s.generation_id = gen.id
     LEFT JOIN scholarships sch ON s.scholarship_id = sch.id
     LEFT JOIN shifts shi ON s.shift_id = shi.id
+    LEFT JOIN grades gra ON s.id = gra.student_id
 `;
 
 const findById = async (id, db) => {
@@ -95,13 +100,14 @@ const insertStudent = async (body, imageUrl, cloudinaryId) => {
     cloudinaryId,
     body.gender,
     body.phone,
+    body.email,
     body.generation_id,
     body.scholarship_id,
     body.shift_id,
     body.status,
   ];
   let [result] = await pool.query(
-    "INSERT INTO students (fullname, profile_url, cloudinary_id, gender, phone, generation_id, scholarship_id, shift_id, status) VALUES (?,?,?,?,?,?,?,?,?)",
+    "INSERT INTO students (fullname, profile_url, cloudinary_id, gender, phone, email, generation_id, scholarship_id, shift_id, status) VALUES (?,?,?,?,?,?,?,?,?,?)",
     arrs,
   );
 
@@ -116,10 +122,11 @@ const updateStudentInfo = async (id, body) => {
     body.generation_id || null,
     body.scholarship_id || null,
     body.shift_id || null,
+    body.email || null,
     body.status || null,
     id,
   ];
-  const sql = `UPDATE students SET fullname = COALESCE(?, fullname), gender = COALESCE(?, gender), phone  = COALESCE(?, phone), generation_id = COALESCE(?, generation_id), scholarship_id = COALESCE(?, scholarship_id), shift_id = COALESCE(?, shift_id), status = COALESCE(?, status) WHERE id = ?`;
+  const sql = `UPDATE students SET fullname = COALESCE(?, fullname), gender = COALESCE(?, gender), phone  = COALESCE(?, phone), generation_id = COALESCE(?, generation_id), scholarship_id = COALESCE(?, scholarship_id), shift_id = COALESCE(?, shift_id), email = COALESCE(?, email), status = COALESCE(?, status) WHERE id = ?`;
 
   const [result] = await pool.query(sql, arrs);
   return result.affectedRows > 0;
@@ -177,7 +184,7 @@ const addStudentToClass = async (student_id, class_id) => {
 
 const getInfoStudentIntoClass = async (id) => {
   const sql = `SELECT 
-      cs.id, cs.student_id, s.fullname, s.profile_url, s.phone, s.gender, cs.class_id, c.name, c.description, cs.created_at
+      cs.id, cs.student_id, s.fullname, s.profile_url, s.phone, s.gender, s.email, cs.class_id, c.name, c.description, cs.created_at
       FROM class_students cs
       JOIN students s ON cs.student_id = s.id
       JOIN classes c ON cs.class_id = c.id where cs.id = ?`;
@@ -202,7 +209,7 @@ const sql = `
         ${baseSelectForAddStudent} 
         ${baseJoinsForAddStudent} 
         WHERE cs.class_id = ? 
-        ORDER BY ?? ${sortDirection} 
+        ORDER BY ?? ${sortDirection}
         LIMIT ? OFFSET ?
     `;
   const [rows] = await pool.query(sql, [classId, sortColumn, limit, offset]);

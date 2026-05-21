@@ -212,4 +212,5 @@ module.exports = {
   deleteScore,
   getStudentScores,
   getSubjectScores,
+  getSubjectScores
 };

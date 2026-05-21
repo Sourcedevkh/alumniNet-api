@@ -17,6 +17,5 @@ router.get("/subject/:subject_id", isLogin, scoreController.getSubjectScores);
 router.get("/:id", isLogin, scoreController.getScoreById);
 router.put("/batch", isLogin, validate(createScoreSchema), scoreController.updateScoresBatch);
 router.delete("/:id", isLogin, scoreController.deleteScore);
-// router.get("/class/:class_id", scoreController.getClassScoreForm);
 
 module.exports = router;
