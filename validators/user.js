@@ -17,7 +17,7 @@ const createUserSchema = Joi.object({
         }),
 
     email: Joi.string()
-        .pattern(/^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/)
+        .pattern(/^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{3,}$/)
         .required()
         .messages({
             'string.base': 'Email must be a string',
@@ -43,7 +43,7 @@ const loginUserSchema = Joi.object({
 
 const emailSchema = Joi.object({
     email: Joi.string()
-        .pattern(/^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/)
+        .pattern(/^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{3,}$/)
         .required()
         .messages({
             'string.base': 'Email must be a string',
@@ -63,7 +63,7 @@ const codeOTPSchema = Joi.object({
 
 const verifyOTPSchema = Joi.object({
     email: Joi.string()
-        .pattern(/^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/)
+        .pattern(/^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{3,}$/)
         .required()
         .messages({
             'string.base': 'Email must be a string',
@@ -80,7 +80,7 @@ const verifyOTPSchema = Joi.object({
 
 const resetVerificationLinkSchema = Joi.object({
     email: Joi.string()
-        .pattern(/^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/)
+        .pattern(/^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{3,}$/)
         .required()
         .messages({
             'string.base': 'Email must be a string',
