@@ -5,6 +5,9 @@ const responeFullData = (data) => {
     profile_url: data.profile_url,
     gender: data.gender,
     phone: data.phone,
+    email: data.email,
+    grade: data.grade,
+    gpa: data.gpa,
     status: data.status,
     class: data.class_id
       ? {
@@ -46,7 +49,10 @@ const responeDataAddStudentToClass = (insertId, data) => {
       fullname: data.fullname,
       profile_url: data.profile_url,
       phone: data.phone,
+      email: data.email,
       gender: data.gender,
+      grade: data.grade,
+      gpa: data.gpa,
     },
     class: {
       id: data.class_id,

@@ -15,13 +15,7 @@ const createStudent = async (body, file) => {
   let cloudinaryId = null;
   const { phone, generation_id, scholarship_id, shift_id } = body;
 
-  if (file) {
-    imageUrl = file.path;
-    cloudinaryId = file.filename;
-  }
-
   const checkPhone = await studentModel.checkPhone(phone.trim());
-  
   if (checkPhone.length > 0) {
     const error = new Error("Invalid input value");
     error.statusCode = 409;
@@ -29,6 +23,10 @@ const createStudent = async (body, file) => {
       message: "Phone is exist",
     };
     throw error;
+  }
+  else if (file) {
+    imageUrl = file.path;
+    cloudinaryId = file.filename;
   }
 
   const [genData, shiftData, scholarData] = await Promise.all([
@@ -47,7 +45,6 @@ const createStudent = async (body, file) => {
     const error = new Error("Invalid input value");
     error.statusCode = 409;
     error.data = { message: errors };
-    // message: errors.join(" | "),
     throw error;
   }
 
@@ -68,7 +65,6 @@ const updateStudentInfo = async (id, body) => {
 
   if (!existingStudent || existingStudent.length === 0) {
     const error = new Error("Student record does not exist.");
-
     error.statusCode = 404;
     error.data = {
       message: "Student not found.",
@@ -78,7 +74,6 @@ const updateStudentInfo = async (id, body) => {
   }
 
   const [student] = existingStudent;
-  // Check duplicate phone
   if (phone && phone.trim() !== student.phone) {
     const phoneExists = await studentModel.checkPhone(phone.trim());
     if (phoneExists && phoneExists.length > 0) {
@@ -93,7 +88,6 @@ const updateStudentInfo = async (id, body) => {
     }
   }
 
-  // Validate foreign keys
   const [genData, shiftData, scholarData] = await Promise.all([
     studentModel.findById(generation_id, "generations"),
     studentModel.findById(shift_id, "shifts"),
@@ -138,6 +132,7 @@ const updateStudentProfile = async (id, file) => {
 
   let imageUrl = null;
   let cloudinaryId = null;
+  
   if (file) {
     imageUrl = file.path;
     cloudinaryId = file.filename;
