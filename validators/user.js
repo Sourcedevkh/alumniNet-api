@@ -175,6 +175,18 @@ const createStudent = Joi.object({
                 "Phone number must contain only digits and be between 7 and 15 numbers"
         }),
 
+    email: Joi.string()
+        .pattern(/^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/)
+        .required()
+        .messages({
+            'string.base': 'Email must be a string',
+            'string.empty': 'Email cannot be empty',
+            'string.pattern.base': 'Please provide a valid email address (e.g., name@domain.com)',
+            'any.required': 'Email is required'
+        }),
+        'string.email': 'Please provide a valid email address (e.g., name@domain.com)',
+        'any.required': 'Email is required',
+
     gender: Joi.number()
         .integer()
         .valid(0, 1)
