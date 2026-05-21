@@ -14,7 +14,7 @@ const register = async (req, res) => {
 const changeStatus = async (req, res) => {
     try {
         const { id } = req.params;
-        const status = req.body.status;
+        const status = req.validateBody.status;
 
         if (status != 0 && status != 1) {
             return sendResponse(res, 400, false, 'Status must be 0 (disable) OR 1 (enable)');
@@ -50,7 +50,7 @@ const verifyAndResetPassword = async (req, res) => {
 
 const unlockAccount = async (req, res) => {
     try {
-        const { email } = req.body;
+        const { email } = req.validateBody;
         await authService.unlockAccount(email);
         return sendResponse(res, 200, true, `Account ${email} has been unlocked`);
     } catch (error) {
