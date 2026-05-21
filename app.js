@@ -26,6 +26,7 @@ const scoreRoute = require('./routes/admin/scoreRoute');
 const certificateRoute = require('./routes/admin/certificateRoute');
 const gradeRoute = require('./routes/admin/gradeRoute');
 const chartRoute = require('./routes/admin/chartRoute');
+const shiftRoute = require('./routes/admin/shiftRoute');
 
 
 app.use('/api/super-admin/auth', authRoute);
@@ -43,6 +44,7 @@ app.use('/api/admin/subjects', subjectRoute);
 app.use('/api/admin/classes', classRoute);
 app.use('/api/admin/grades', gradeRoute);
 app.use('/api/admin/chart', chartRoute);
+app.use('/api/admin/shift', shiftRoute);
 
 
 
