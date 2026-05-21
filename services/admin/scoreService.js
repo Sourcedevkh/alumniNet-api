@@ -105,33 +105,6 @@ const createScore = async (body) => {
     : createdScores[0];
 };
 
-const updateScore = async (id, body) => {
-  const existing = await getScoreById(id);
-
-  const updatedscore = {
-    student_id: body.student_id !== undefined ? body.student_id : existing.student_id,
-    subject_id: body.subject_id !== undefined ? body.subject_id : existing.subject_id,
-    score: body.score !== undefined ? body.score : existing.score,
-  };
-
-  const { error, value } = updateScoreSchema.validate(updatedscore, {
-    abortEarly: false,
-    allowUnknown: true,
-  });
-
-  if (error) {
-    const err = new Error(error.details[0].message);
-    err.statusCode = 400;
-    throw err;
-  }
-
-  await ensureStudentExists(value.student_id);
-  await ensureSubjectExists(value.subject_id);
-
-  const rows = await scoreModel.updateScore(id, value);
-  return rows[0] || rows;
-};
-
 const updateScoresBatch = async (body) => {
   const { error, value } = createScoreSchema.validate(body, {
     abortEarly: false,
@@ -235,10 +208,8 @@ module.exports = {
   getAllScores,
   getScoreById,
   createScore,
-  updateScore,
   updateScoresBatch,
   deleteScore,
   getStudentScores,
-  getSubjectScores,
-//   getClassScoreForm,
+  getSubjectScores
 };
